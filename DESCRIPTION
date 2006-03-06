@@ -1,0 +1,13 @@
+Package: Heatplus
+Version: 1.1.0
+Title: A heat map displaying covariates and coloring clusters  
+Author: Alexander Ploner <Alexander.Ploner@ki.se>
+Maintainer: Alexander Ploner <Alexander.Ploner@ki.se>
+Description: Add an extra graphical display at the bottom of a heat map,
+ indicating for each column a) whether it has one of several binary properties
+ or not, and b) the value of a quantitative variable. A cutting threshold for
+ the sample dendrogram can also be specified, and the resulting clustering of
+ the columns is indicated by coloring both the dendrogram and the extra variable 
+ display.
+biocViews: Microarray, Visualization
+License: GPL 2 or later
