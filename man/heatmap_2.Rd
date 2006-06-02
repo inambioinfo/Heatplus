@@ -34,6 +34,8 @@ heatmap_2(x, Rowv, Colv, distfun = dist, hclustfun = hclust, add.expr,
 \details{
 With all parameters at their default, this gives the same result as a very old  version of \code{heatmap} that was the base for the modifications. All parameters of the same name have the same function as in \code{heatmap}, though \code{add.expr}, which can be used for adding graphical elements after the call to \code{image}, will probably not produce useful results. Note also that row- and column labels are optional, i.e. if the corresponding \code{dimname} of \code{x} is \code{NULL}, no labels are displayed.
 
+Note that setting \code{Rowv} or \code{Colv} to \code{NA} completely suppresses re-ordering of rows or columns as well as the corresponding dendrogram. Setting both to \code{NA} works basically like \code{image} (though you can still add a legend).
+
 Setting \code{trim} to a number between 0 and 1 uses equidistant classes between the (\code{trim})- and (1-\code{trim})-quantile, and lumps the values below and above this range into separate open-ended classes. If the data comes from a 
 heavy-tailed distribution, this can save the display from putting too many values into to few classes.
 }

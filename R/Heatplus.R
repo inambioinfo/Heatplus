@@ -11,7 +11,8 @@ heatmap_2 = function (x, Rowv, Colv, distfun = dist, hclustfun = hclust,
 # Chng: 031120 AP added trim
 #       040129 AP added na.rm to quantiles
 #       060303 AP changed name 
-#
+#       060602 AP Rowv/Colv=NA suppresses re-ordering completely,
+#                 margins are now wider if no dendro is plotted
 {
     # scaling & clustering, unchanged
     scale <- match.arg(scale)
@@ -27,20 +28,29 @@ heatmap_2 = function (x, Rowv, Colv, distfun = dist, hclustfun = hclust,
         Rowv <- rowMeans(x, na.rm = na.rm)
     if (missing(Colv)) 
         Colv <- colMeans(x, na.rm = na.rm)
-    if (!inherits(Rowv, "dendrogram")) {
-        hcr <- hclustfun(distfun(x))
-        ddr <- as.dendrogram(hcr)
-        ddr <- reorder(ddr, Rowv)
+    ## Set up dendrograms otherwise told not to
+    if (!identical(Rowv, NA)) {
+        if (!inherits(Rowv, "dendrogram")) {
+            hcr <- hclustfun(distfun(x))
+            ddr <- as.dendrogram(hcr)
+            ddr <- reorder(ddr, Rowv)
+        } else ddr <- Rowv
+        rowInd <- order.dendrogram(ddr)    
+    } else {
+        rowInd = 1:nr
+        do.dendro[1] = FALSE
     }
-    else ddr <- Rowv
-    if (!inherits(Colv, "dendrogram")) {
-        hcc <- hclustfun(distfun(t(x)))
-        ddc <- as.dendrogram(hcc)
-        ddc <- reorder(ddc, Colv)
+    if (!identical(Colv, NA)) {        
+        if (!inherits(Colv, "dendrogram")) {
+            hcc <- hclustfun(distfun(t(x)))
+            ddc <- as.dendrogram(hcc)
+            ddc <- reorder(ddc, Colv)
+        } else ddc <- Colv
+        colInd <- order.dendrogram(ddc)
+    } else {
+        colInd = 1:nc
+        do.dendro[2] = FALSE
     }
-    else ddc <- Colv
-    rowInd <- order.dendrogram(ddr)
-    colInd <- order.dendrogram(ddc)
     x <- x[rowInd, colInd]
     if (scale == "row") {
         x <- sweep(x, 1, rowMeans(x, na.rm = na.rm))
@@ -66,8 +76,10 @@ heatmap_2 = function (x, Rowv, Colv, distfun = dist, hclustfun = hclust,
     do.xaxis = !is.null(colnames(x))
     do.yaxis = !is.null(rownames(x))
     margin = rep(0, 4)
-    margin[1] = if (do.xaxis) 5 else 0
-    margin[4] = if (do.yaxis) 5 else 0
+    margin[1] = if (do.xaxis) 5 else 2
+    margin[2] = if (do.dendro[1]) 0  else 2
+    margin[3] = if (do.dendro[2]) 0  else 2    
+    margin[4] = if (do.yaxis) 5 else 2
     # Choose layout according to dendrograms
     if (do.dendro[1] & do.dendro[2]) {
         ll = matrix(c(0, 3, 2, 1), 2, 2, byrow = TRUE)
