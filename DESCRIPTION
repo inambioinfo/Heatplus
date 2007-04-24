@@ -1,5 +1,5 @@
 Package: Heatplus
-Version: 1.6.0
+Version: 1.7.0
 Title: A heat map displaying covariates and coloring clusters  
 Author: Alexander Ploner <Alexander.Ploner@ki.se>
 Maintainer: Alexander Ploner <Alexander.Ploner@ki.se>
