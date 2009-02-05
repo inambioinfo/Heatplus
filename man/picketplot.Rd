@@ -22,8 +22,9 @@ picketplot(x, covariate = NULL, grp = NULL, grpcol, grplabel = NULL,
   \item{control}{a list of parameters controlling the appearance of the plot, see Details.}
 }
 \details{
-The following named list elements can be set to change the appearance of the plot:
-
+The following named list elements can be set to change the appearance of the
+plot: 
+  \describe{
     \item{boxw}{the relative width of a marking box.}
     \item{boxh}{the relative height of a marking box.}
     \item{hbuff}{the horizontal separation around marking boxes; equals half the 
@@ -31,9 +32,10 @@ The following named list elements can be set to change the appearance of the plo
     \item{vbuff}{ditto for vertical separation.}
     \item{span}{passed on to \code{loess} used for the smoothing curve.}
     \item{nacol}{color for missing values of binary variables.}
-    \item{degree}{if 0, no smoothing line is drawn; otherwise passed on to \code{loess} used for 
-                  the smoothing curve.}
+    \item{degree}{if 0, no smoothing line is drawn; otherwise passed on to
+    \code{loess} used for the smoothing curve.}
     \item{cex.label}{the character size for \code{grplabel}.}
+  }
 }
 \author{Alexander Ploner <Alexander.Ploner@ki.se>}
 \note{The plot looks like a more or less derelict picket fence, and 'picketplot' sounds somewhat like the 'pocketplot' used in geostatistics.}
