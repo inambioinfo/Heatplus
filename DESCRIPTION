@@ -1,5 +1,5 @@
 Package: Heatplus
-Version: 1.15.0
+Version: 1.15.1
 Title: A heat map displaying covariates and coloring clusters  
 Author: Alexander Ploner <Alexander.Ploner@ki.se>
 Maintainer: Alexander Ploner <Alexander.Ploner@ki.se>
@@ -10,4 +10,4 @@ Description: Add an extra graphical display at the bottom of a heat map,
  the columns is indicated by coloring both the dendrogram and the extra variable 
  display.
 biocViews: Microarray, Visualization
-License: GPL 2 or later
+License: GPL (>= 2)
