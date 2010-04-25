@@ -9,5 +9,6 @@ Description: Add an extra graphical display at the bottom of a heat map,
  the sample dendrogram can also be specified, and the resulting clustering of
  the columns is indicated by coloring both the dendrogram and the extra variable 
  display.
+Imports: graphics, grDevices, stats
 biocViews: Microarray, Visualization
 License: GPL (>= 2)
