@@ -16,8 +16,8 @@ heatmap_plus(x, addvar, covariate = NULL, picket.control = list(), h, clus,
   \item{x}{the numerical data matrix to be displayed.}
   \item{addvar}{data frame with (mostly binary) covariates.}
   \item{covariate}{integer indicating the one column in \code{addvar} that is interval scaled.}
-  \item{picket.control}{list of option for drawing the covariates, passed to \code{picketplot}.}
-  \item{h}{height at which to cut the dendrogram, as in \code{cutree}; overrides \code{clus}.}
+  \item{picket.control}{list of option for drawing the covariates, passed to \code{oldPicketplot}.}
+  \item{h}{height at which to cut the dendrogram, as in \code{oldCutree}; overrides \code{clus}.}
   \item{clus}{an explicit vector of cluster memberships for the columns of \code{x}, if no dendrogram is used; ignored if \code{do.dendro=TRUE} and \code{h} is specified.}
   \item{cluscol}{a vector of colors used to indicate clusters.}
   \item{cluslabel}{labels to designate cluster names.}
@@ -51,7 +51,7 @@ A list with components
 
 Alexander Ploner for the modifications documented here.
 }
-\seealso{\code{\link{heatmap_2}}, \code{\link{heatmap}}, \code{\link{picketplot}}, \code{\link{cutplot.dendrogram}},
+\seealso{\code{\link{heatmap_2}}, \code{\link{heatmap}}, \code{\link{oldPicketplot}}, \code{\link{oldCutplot.dendrogram}},
          \code{\link{RGBColVec}}}
 \examples{
 # create data

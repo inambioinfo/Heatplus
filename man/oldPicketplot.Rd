@@ -1,14 +1,14 @@
-\name{picketplot}
-\alias{picketplot}
+\name{oldPicketplot}
+\alias{oldPicketplot}
 \title{Barplots for Several Binary Variables}
 \description{
 Display one or more binary variables by using black bars for presence/validity
-of a condition, empty space for absence/invalidity, and an extra color for missing values. Additionally, an index plot for one interval scaled variable can be added, possibly with a smoothing function.
+of a condition, empty space for absence/invalidity, and an extra color for missing values. Additionally, an index plot for one interval scaled variable can be added, possibly with a smoothing function (OLD version, to be deprecated).
 
 This routine is primarily intended for augmenting heatmaps. It might be useful in other contexts, but misses most frills for using it comfortably.
 }
 \usage{
-picketplot(x, covariate = NULL, grp = NULL, grpcol, grplabel = NULL, 
+oldPicketplot(x, covariate = NULL, grp = NULL, grpcol, grplabel = NULL, 
            add = FALSE, control = list())
 }
 %- maybe also 'usage' for other objects documented here.
@@ -44,21 +44,21 @@ plot:
 # without covariate
 mm = cbind(sample(0:1, 42, rep=TRUE), sample(0:1, 42, rep=TRUE))
 mm[sample(42, 5), 1] = NA
-picketplot(mm)
+oldPicketplot(mm)
 
 # with clustering
 cl = rep(1:3, c(10,22,10))
 cn = c("Cluster I","Cluster II","Cluster III")
 cc = c("lightblue","lightgreen","lightpink") # windows palette
-picketplot(mm, grp=cl, grplabel=cn, grpcol=cc)
+oldPicketplot(mm, grp=cl, grplabel=cn, grpcol=cc)
 
 # add a covariate; setting the colnames makes the variable labels
 mm = cbind(mm, rnorm(42) + cl/2)
 colnames(mm) = c("State A","State B", "X")
-picketplot(mm, covariate=3,grp=cl, grplabel=cn, grpcol=cc)
+oldPicketplot(mm, covariate=3,grp=cl, grplabel=cn, grpcol=cc)
 
 # using extra controls
-picketplot(mm, covariate=3,grp=cl, grplabel=cn, grpcol=cc, control=list(nacol="white", degree=0))
+oldPicketplot(mm, covariate=3,grp=cl, grplabel=cn, grpcol=cc, control=list(nacol="white", degree=0))
 
 }
 \keyword{hplot}% at least one, from doc/KEYWORDS
