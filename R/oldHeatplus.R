@@ -1,3 +1,10 @@
+## oldHeatplus.R
+##
+## R code for the original version of the annotated heatmaps (columns only)
+## Apart from some helper functions, this is historical code 
+##
+## 2011-08-11   Alexander.Ploner@ki.se
+
 heatmap_2 = function (x, Rowv, Colv, distfun = dist, hclustfun = hclust, 
                       add.expr, scale = c("row", "column", "none"), na.rm = TRUE, 
                       do.dendro=c(TRUE,TRUE), legend=0, legfrac=8, 
