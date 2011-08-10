@@ -293,7 +293,7 @@ heatmap_plus = function (x, addvar, covariate=NULL, picket.control=list(),
     par(mar = mm)            
     # our own, unter Schmerzen
     if (do.dendro) {
-        grp = cutplot.dendrogram(ddc, h, cluscol=cluscol, axes = FALSE, xaxs = "i", leaflab = "none")
+        grp = oldCutplot.dendrogram(ddc, h, cluscol=cluscol, axes = FALSE, xaxs = "i", leaflab = "none")
     } 
     # the actual plot            
     mm = c(1,1, if (do.xlabels) 3 else 0, 2)
@@ -319,17 +319,17 @@ heatmap_plus = function (x, addvar, covariate=NULL, picket.control=list(),
     }
     if (!missing(addvar)) {
         par(mar=c(0,1,0,2))        
-        picketplot(addvar[colInd, , drop=FALSE], covariate=covariate, add=TRUE, control=picket.control, grp=grp, grpcol=cluscol, grplabel=cluslabel)
+        oldPicketplot(addvar[colInd, , drop=FALSE], covariate=covariate, add=TRUE, control=picket.control, grp=grp, grpcol=cluscol, grplabel=cluslabel)
     }
     
         
     invisible(list(rowInd = rowInd, colInd = colInd, clus=grp))
 }
 
-cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, 
+oldCutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, 
                               ...)
 #
-# Name: cutplot.dendrogram
+# Name: OldCutplot.dendrogram
 # Desc: takes a dendrogram as described in library(mva), cuts it at level h,
 #       and plots the dendrogram with the resulting subtrees in different 
 #       colors
@@ -339,8 +339,9 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 # Chng: 050204 AP 
 #       changed environment(plot.hclust) to environment(as.dendrogram) to
 #       make it work with R 1.8.1
-#       250304 AP added RainbowPastel() to make it consistent with picketplot
+#       250304 AP added RainbowPastel() to make it consistent with oldPicketplot
 #       030306 AP slightly more elegant access of plotNode
+#       100811 AP name change to avoid collisions
 #
 {
     if (missing(h)) {
@@ -374,10 +375,10 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
     
 }
 
-picketplot = function (x, covariate=NULL, grp=NULL, grpcol, grplabel=NULL, 
+oldPicketplot = function (x, covariate=NULL, grp=NULL, grpcol, grplabel=NULL, 
                        add=FALSE, control=list()) 
 #
-# Name: picketplot (looks like a picket fence with holes, and sounds like the
+# Name: oldPicketplot (looks like a picket fence with holes, and sounds like the
 #                   pocketplot in geostatistics)
 # Desc: visualizes a pattern of 0/1/NAs by using bars, great for annotating a 
 #       heatmap
@@ -390,6 +391,7 @@ picketplot = function (x, covariate=NULL, grp=NULL, grpcol, grplabel=NULL,
 #       030304 AP
 #       - added RainbowPastel() as default colors
 #       - check grplabel before passing it to axis
+#       108011 AP name change to avoid collisions
 #
 {
     
