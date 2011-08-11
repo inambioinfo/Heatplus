@@ -1,14 +1,10 @@
 Package: Heatplus
-Version: 1.23.0
-Title: A heat map displaying covariates and coloring clusters  
+Version: 1.99.0
+Date: 2011-08-11
+Title: Heatmaps with row and/or column covariates and colored clusters  
 Author: Alexander Ploner <Alexander.Ploner@ki.se>
 Maintainer: Alexander Ploner <Alexander.Ploner@ki.se>
-Description: Add an extra graphical display at the bottom of a heat map,
- indicating for each column a) whether it has one of several binary properties
- or not, and b) the value of a quantitative variable. A cutting threshold for
- the sample dendrogram can also be specified, and the resulting clustering of
- the columns is indicated by coloring both the dendrogram and the extra variable 
- display.
+Description: Display a rectangular heatmap (intensity plot) of a data matrix. By default, both samples (columns) and features (row) of the matrix are sorted according to a hierarchical clustering, and the corresponding dendrogram is plotted. Optionally, panels with additional information about samples and features can be added to the plot.  
 Imports: graphics, grDevices, stats
 biocViews: Microarray, Visualization
 License: GPL (>= 2)
