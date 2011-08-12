@@ -1,6 +1,6 @@
 \documentclass[10pt]{article}
 
-%\VignetteIndexEntry{Heatplus Introduction}
+%\VignetteIndexEntry{Old Heatplus functions (deprecate)}
 %\VignetteDepends{}
 %\VignetteKeywords{microarray, visualization}
 %\VignettePackage{Heatplus}
@@ -32,7 +32,7 @@
 
  \begin{document}
 
-\title{Introduction to the \Rpackage{Heatplus} package}
+\title{Some superseded functions in package \Rpackage{Heatplus}}
 \author{Alexander Ploner\\
 Medical Epidemiology \& Biostatistics\\
 Karolinska Institutet, Stockholm\\
@@ -45,7 +45,10 @@ email: \texttt{alexander.ploner@ki.se}}
 options(width=65)
 @
 
-The \Rpackage{Heatplus} offers an extended heatmap display, including covariates and color-coding of clusters.
+The \Rpackage{Heatplus} offers an extended heatmap display, including covariates and color-coding of clusters. This document demonstrates the use of the functions \texttt{heatplus\_2} and \texttt{heatmap\_plus} for generating regular and annotated heatmaps. 
+\begin{center}
+\fbox{\parbox{\textwidth}{ \large These functions have been superseded by \texttt{regHeatmap} and \texttt{annHeatmap} and are included for historical reasons only!}}
+\end{center}
 
 We start with preparing a structured data matrix that looks somewhat like a gene expression matrix with 45 samples and 130 genes:
 <<>>=
