@@ -552,19 +552,3 @@ RGBColVec = function (nrgcols=12)
 
     colvec
 }
-
-RainbowPastel =  function (n, blanche=200, ...)
-#
-# Name: RainbowPastel
-# Desc: constructs a rainbow clolr vector, but more pastelly
-# Auth: Alexander.Ploner@mep.ki.se      030304
-#
-# Chng:
-#
-
-{
-    cv = rainbow(n, ...)
-    rgbcv = col2rgb(cv)
-    rgbcv = pmin(rgbcv+blanche, 255)
-    rgb(rgbcv[1,], rgbcv[2,], rgbcv[3, ], maxColorValue=255)
-}

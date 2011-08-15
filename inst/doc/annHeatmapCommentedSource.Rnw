@@ -1,7 +1,57 @@
-###################################################
-### chunk number 1: heatmapLayout_Def
-###################################################
-#line 10 "annHeatmap.Rnw"
+%\VignetteIndexEntry{Commented source for annotated and regular heatmaps}
+%\VignetteDepends{}
+%\VignetteKeywords{microarray, visualization}
+%\VignettePackage{Heatplus}
+\documentclass[12pt]{article}
+
+\usepackage[authoryear,round]{natbib}
+\usepackage{url}
+\usepackage{Sweave}
+
+%% Paragraphs w/o indent
+\setlength{\parskip}{0.7ex plus0.1ex minus0.1ex}
+\setlength{\parindent}{0em}
+
+%% The options
+\SweaveOpts{eps=FALSE, prefix.string=annHeatmapSource, width=8, height=8} 
+
+%% Other people's markup
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\texttt{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+
+ \begin{document}
+
+\title{Commented source code for regular and annotated heatmaps in package \texttt{Heatplus}}
+\author{Alexander Ploner\\
+Medical Epidemiology \& Biostatistics\\
+Karolinska Institutet, Stockholm\\
+email: \url{alexander.ploner@ki.se}}
+
+\maketitle
+\begin{abstract}
+This is the commented version of the R source for providing annotated and regular heatmaps. The code in Heatplus/R is a tangled version of this file.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%% Reduce output line width
+<<echo=FALSE, results=hide>>=
+options(width=75)
+@
+
+{{{\section{Helper functions}
+
+{{{\subsection{Defining the plot layout}
+
+We start with an empty maximal layout (i.e. space for the central image, both row and column dendrograms and annotations, and legends on all four sides). We then fill in the numbers of the plots in a given order, as well as setting the corresponding widths and heights. At the end, we remove all empty plotting slots, compressing the maximal layout to the actual layout.
+
+<<heatmapLayout_Def>>=
 heatmapLayout = function(dendrogram, annotation, leg.side=NULL, show=FALSE)
 {
     ## Start: maximum matrix, 5 x 5, all zero
@@ -91,12 +141,16 @@ heatmapLayout = function(dendrogram, annotation, leg.side=NULL, show=FALSE)
     }
     return(list(plot=ll, width=ll.width, height=ll.height, legend.side=leg.side))
 }
+@
 
+}}}
 
-###################################################
-### chunk number 2: modifyExistingList_Def
-###################################################
-#line 109 "annHeatmap.Rnw"
+{{{\subsection{Processing the argument lists}
+
+Seeing as we have very much the same possible arguments for row and column dendrograms, annotations and clustering, we follow the example of the lattice argument scales, which uses sub-lists named x and y to set axis-specific elements, and otherwise assumes that all other arguments are set for both axes. The underlying code can be seen in \Rfunction{xyplot.formula} and \Rfunction{construct.scales} in package \Rpackage{lattice} and \Rfunction{modifyList} (which has migrated from \Rpackage{lattice} to \Rpackage{utils}). 
+
+\Rfunction{modifyList} fills in recursively all entries from a source list into a target list, including entries that do not exist in the target list. I'd like to be a bit more strict here, and only copy entries from the source list that already exist under the same name in the target list (only overwrite, no new write):
+<<modifyExistingList_Def>>=
 modifyExistingList = function(x, val)
 {
     if (is.null(x)) x = list()
@@ -111,12 +165,11 @@ modifyExistingList = function(x, val)
     }
     x
 }
+@
+Note that this code accepts NULL as valid shorthand for the empty list list().
 
-
-###################################################
-### chunk number 3: extractArg_Def
-###################################################
-#line 128 "annHeatmap.Rnw"
+We can use this generic function within a specific function for extracting heatmap-related arguments:
+<<extractArg_Def>>=
 extractArg = function(arglist, deflist)
 {
     if (missing(arglist)) arglist = NULL
@@ -126,12 +179,19 @@ extractArg = function(arglist, deflist)
     col = modifyExistingList(col, arglist[["Col"]])    
     list(Row=row, Col=col)  
 }
+@
+\Rfunarg{arglist} is the list of arguments as passed into the calling function; \Rfunarg{deflist} is a complete list of all possible entries (arguments) for this list, but without the recursive sub-lists \Robject{Row} and \Robject{Col}. The function first copies the globally set options from the argument list into the default template, using this as the base for the row- and column specific argument lists, and only then copies in the entries set in the sub-lists. It returns a list with two entries, \Robject{Row} and \Robject{Col}, where all possible options are set (possibly to their default), making it easy to process.
 
 
-###################################################
-### chunk number 4: picketPlot_Def
-###################################################
-#line 150 "annHeatmap.Rnw"
+}}}
+
+{{{\subsection{Adding annotation}
+
+This is a completely reworked version of the original picket plot. The most important differences from a user point of view are that a) we can have more than one covariate (non-factor), and b) we do not have to convert factors to binaries by hand. On the technical side, this is done by drawing everything in one plot window (instead of having a separate plot window for the covariate, as previously) and by using the \Rfunction{model.matrix} function to generate dummies.
+
+In terms of mostly hidden functionality, picket plots can now be plotted vertically as well as horizontally: in principle, a  small change, but a clean implementation requires some re-arrangement of the code. What I have done here is to separate the set-up of the plot and the actual drawing as far as possible, so that essentially, I only have to swap coordinates at one place, if required. A really clean implementation would split the function into a generating function and a plotting function. Note that internally, we work with matrices with two columns for x- and y-coordinates, even for single points.
+
+<<picketPlot_Def>>=
 picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, add=FALSE, horizontal=TRUE, control=list()) 
 #
 # Name: picketPlot (looks like a picket fence with holes, and sounds like the
@@ -297,12 +357,22 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, add=FALSE, horizontal
     }                                
 
 }
+@
 
+}}}
 
-###################################################
-### chunk number 5: findBreaks_Def
-###################################################
-#line 331 "annHeatmap.Rnw"
+{{{\subsection{Defining clean breaks}
+
+I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from image, with the trim and equalize modifiers. Ordinarily, there would not be much need for more sophistication than that, but if we want a plausible method for expression sets, we do not want to have to extract the expression matrix, apply a function, pass it in again with the pheno data etc., so having some mechanism at least for the method makes sense. Preferably we want to have some useful shorthands for different types of classes, e.g. equal widths around zero (useful for correlation matrices and residuals, too).
+
+So we have an argument \Rfunarg{breaks} that allows the following specification:
+\begin{itemize}
+\item a vector containing the actual breaks,
+\item a number indicating the number of classes, together with an optional type: either equal widths or equal counts.
+\end{itemize}
+If unspecified, the number of classes can be calculated using one of the helper functions for \Rfunction{hist} like \Rfunarg{nclass.Sturges}, and the type can depend on the skewness of the data. We wrap this into a service function that returns the classes plus some meta-information that may be useful for plotting the legend.
+
+<<findBreaks_Def>>=
 findBreaks = function(x, n, type)
 {
     if (missing(type)) type = "length"
@@ -318,12 +388,20 @@ findBreaks = function(x, n, type)
     attr(brks, "type") = type
     brks
 }
+@
 
+}}}
 
-###################################################
-### chunk number 6: doLegend_Def
-###################################################
-#line 360 "annHeatmap.Rnw"
+{{{\subsection{Adding a legend}
+
+Here we have several options that could be considered (and may even be implemented one day):
+\begin{itemize}
+\item a simple strip with an axis, indicating the range of values and colors, as in the old heatmaps;
+\item a stack of colored rectangles, indicating the different colors, and giving the class limits (i.e. the size of the color rectangle is not proportional to the class width);
+\item some variant of th cool histogram legend they have in \Rfunction{heatmap2}.
+\end{itemize}
+
+<<doLegend_Def>>=
 doLegend = function(r, col, side)
 {
     nc = length(col)
@@ -336,12 +414,16 @@ doLegend = function(r, col, side)
     }        
     axis(side, las=1)
 }
+@
 
 
-###################################################
-### chunk number 7: convAnnData_Def
-###################################################
-#line 382 "annHeatmap.Rnw"
+}}}
+
+{{{\subsection{Pre-process annonation data frames}
+
+An annotation data frame should have either factors or numerical variables. This requires e.g. conversion of logical values, but also numerically coded factors (say 0/1). We take a leave from Frank Harrel's book and convert numerical variables with fewer than some $c$ variables into factors.
+
+<<convAnnData_Def>>=
 convAnnData = function(x, nval.fac=3)
 {
     if (is.null(x)) return(NULL)
@@ -354,12 +436,17 @@ convAnnData = function(x, nval.fac=3)
     }
     x
 }
+@           
+        
 
+}}}
 
-###################################################
-### chunk number 8: cut.dendrogram_Def
-###################################################
-#line 405 "annHeatmap.Rnw"
+{{{\subsection{Cut a dendrogram}
+
+An annoying feature of the old version was that we were schlepping around the hclust and the dendrogram version of the same object, because the cut function for dendrograms does not return a nice clustering variable. 
+
+This is fairly straightforward, with an interesting complication: for an organically grown dendrogram, \Rfunction{order.dendrogram} returns the index of the leaves wrt to the original order of the underlying data, and we can use it to re-order in an intuitive manner. For dendrograms that result from cutting up such an organically grown dendrogram, this index remains unchanged: in other words, just looking at the sub-dendrogram, we only get the clustering for the leaves in the sub-tree, with the ordering pointing to a potentially much larger data set of unknown size. We could return a padded vector with lots of NAs, but here I just check and fail informatively when we encounter this situation.
+<<cut.dendrogram_Def>>=
 cutree.dendrogram = function(x, h)
 {
     # Cut the tree, get the labels
@@ -380,22 +467,25 @@ cutree.dendrogram = function(x, h)
     names(ret)[ord] = unlist(cutl)
     ret
 }
+@
+Note that since R version 2.13.0, there is a function \Rfunction{as.hclust.dendrogram}, so that we could just convert our dendrogram internally and use \Rfunction{cutree}. First of all, I don't like to force people to upgrade to the latest version just for one silly command, secondly, this combo does currently not deal correctly with the sub-tree situation either, but returns crap instead of failing. So maybe somwhere down the road\ldots
 
-
-###################################################
-### chunk number 9: getLeaves_Def
-###################################################
-#line 430 "annHeatmap.Rnw"
+A nice little helper-helper that traverses the dendrogram and returns the labels of the leaves. Note that a simple recursion would work as well for binary trees, but it fails for dendrograms with more than two branches (see examples in \Robject{?dendrogram} for such a beast). So we sacrifice a bit of performance for (strictly speaking unnecessary) generality:
+<<getLeaves_Def>>=
 getLeaves = function(x)
 {
     unlist(dendrapply(x, function(x) attr(x, "label")))
 }
+@
 
 
-###################################################
-### chunk number 10: print.annHeatmap_Def
-###################################################
-#line 444 "annHeatmap.Rnw"
+}}}
+
+{{{\subsection{A reasonable print method}
+
+We have decided to stick with S3 classes -- if it's good enough for lattice graphics, it's definitely good enough for us, god bless them. Below a prototype for a showing a short description:
+
+<<print.annHeatmap_Def>>=
 print.annHeatmap = function(x, ...)
 {
     cat("annotated Heatmap\n\n")
@@ -405,12 +495,16 @@ print.annHeatmap = function(x, ...)
     cat("\t", if (is.null(x$annotation$Col$data)) 0 else ncol(x$annotation$Col$data), " annotation variable(s)\n")
     invisible(x)
 }
+@
+    
+}}}
 
+{{{\subsection{From the previous version}
 
-###################################################
-### chunk number 11: RainbowPastel_Def
-###################################################
-#line 463 "annHeatmap.Rnw"
+These functions are copied from the old Heatplus, with little or no changes.
+
+Nice (?) colors for the different clusters:
+<<RainbowPastel_Def>>=
 RainbowPastel =  function (n, blanche=200, ...)
 #
 # Name: RainbowPastel
@@ -426,12 +520,11 @@ RainbowPastel =  function (n, blanche=200, ...)
     rgbcv = pmin(rgbcv+blanche, 255)
     rgb(rgbcv[1,], rgbcv[2,], rgbcv[3, ], maxColorValue=255)
 }
+@
 
 
-###################################################
-### chunk number 12: cutplot_dendrogam_Def
-###################################################
-#line 483 "annHeatmap.Rnw"
+FIXME: does nothing for singleton clusters!!
+<<cutplot_dendrogam_Def>>=
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
 # Name: cutplot.dendrogram
@@ -478,12 +571,21 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
    }
  
 }
+@
 
 
-###################################################
-### chunk number 13: annHeatmap2_Def
-###################################################
-#line 544 "annHeatmap.Rnw"
+
+}}}
+
+\newpage}}}
+
+{{{\section{Working functions}
+
+{{{\subsection{Generating function}
+
+This is the actual workhorse underlying the different functions for generating standard plots. It allows any combination of row and column dendrograms and annotations, and has a consistent, if not very friendly interface, based on lists within lists, as described above. The point of this function is to offer an expert access to the bells and whistles in a sane manner; the casual user will prefer one of the wrapping functions creating e.g. a standard annotated heatmap with column annotation and without row dendrogram.
+
+<<annHeatmap2_Def>>=
 annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), col=heat.colors(12), equalize=FALSE, trim, legend=FALSE)
 #
 # Name: annHeatmap2
@@ -597,12 +699,15 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ret
 
 }
+@
 
+}}}
 
-###################################################
-### chunk number 14: plot.annHeatmap_Def
-###################################################
-#line 666 "annHeatmap.Rnw"
+{{{\subsection{Plotting function}
+
+This function takes the \Robject{annHeatmap} object generated from the user input and plots as required.
+
+<<plot.annHeatmap_Def>>=
 plot.annHeatmap = function(x, ...)
 {
     ## Set up the layout
@@ -661,47 +766,65 @@ plot.annHeatmap = function(x, ...)
 }
 
 
+@
 
+}}}
 
-###################################################
-### chunk number 15: Generics_Def
-###################################################
-#line 737 "annHeatmap.Rnw"
+\newpage}}}
+
+{{{\section{Wrapping functions}
+
+{{{\subsection{Generic methods}
+
+We define a set of standard for invocations for S3 classes.
+
+<<Generics_Def>>=
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
+@
 
+}}}
 
-###################################################
-### chunk number 16: regHeatmap_Def
-###################################################
-#line 747 "annHeatmap.Rnw"
+{{{\subsection{Default standard heatmap}
+
+We plot a standard heatmap without annotation:
+<<regHeatmap_Def>>=
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=NULL, cluster=NULL,  labels=labels, legend=legend, ...)
     ret
 }
+@
 
+}}}
 
-###################################################
-### chunk number 17: annHeatmap_Def
-###################################################
-#line 760 "annHeatmap.Rnw"
+{{{\subsection{Default standard annotated heatmap}
+
+We plot a standard annotated heatmap (annotated columns, no row dendrogram):
+<<annHeatmap_Def>>=
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=list(Col=list(data=annotation, fun=picketPlot)), cluster=cluster,  labels=labels, legend=TRUE, ...)
     ret
 }
+@
 
+}}}
 
-###################################################
-### chunk number 18: annHeatmapExpressionSet_Def
-###################################################
-#line 772 "annHeatmap.Rnw"
+{{{\subsection{Annotated heatmap for ExpressionSet}
+
+<<annHeatmapExpressionSet_Def>>=
 annHeatmap.ExpressionSet =function(x, ...)
 {
     expmat = exprs(x)
     anndat = pData(x)
     annHeatmap(expmat, anndat, ...)
 }
+@
 
+}}}
+
+\newpage}}}
+
+\end{document}
 
