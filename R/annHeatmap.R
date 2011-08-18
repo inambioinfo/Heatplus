@@ -132,7 +132,7 @@ extractArg = function(arglist, deflist)
 ### chunk number 4: picketPlot_Def
 ###################################################
 #line 150 "annHeatmap.Rnw"
-picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, add=FALSE, horizontal=TRUE, control=list()) 
+picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, control=list()) 
 #
 # Name: picketPlot (looks like a picket fence with holes, and sounds like the
 #                   pocketplot in geostatistics)
@@ -639,11 +639,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, add=TRUE)
+        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, add=TRUE, horizontal=FALSE)
+        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
