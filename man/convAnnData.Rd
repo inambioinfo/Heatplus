@@ -3,65 +3,29 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Converting data frames for display as annotation}
 \description{
-Converting data frames for display as annotation
+Converts a data frames for display as annotation in a heatmap. This is mostly intended as an internal function, but might be useful for finetuning an annotation data frame manually. 
 }
 \usage{
 convAnnData(x, nval.fac = 3)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{x}{the data frame to be converted}
+  \item{nval.fac}{lower limit for unique values in numerical variables}
 }
-  \item{nval.fac}{
-%%     ~~Describe \code{nval.fac} here~~
+\details{Logical variables are converted to factors. So are numerical variables with less than \code{nval.fac} unique values.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
+\value{\code{convAnnData} returns the converted data frame.}
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+Alexander Ploner <Alexander.Ploner@ki.se}
+\seealso{\code{\link{annHeatmap2}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(x, nval.fac=3)
-{
-    if (is.null(x)) return(NULL)
-    x = as.data.frame(x)
-    if (!is.null(nval.fac) & nval.fac>0) doConv = TRUE
-    vv = colnames(x)
-    for (v in vv) {
-        if (is.logical(x[,v])) x[,v] = factor(as.numerical(x[,v]))
-        if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) x[,v] = factor(x[,v])    
-    }
-    x
-  }
+data(mtcars)
+summary(mtcars)
+summary(convAnnData(mtcars))
+summary(convAnnData(mtcars, nval.fac=2))    
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
+
