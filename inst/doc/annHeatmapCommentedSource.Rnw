@@ -192,7 +192,7 @@ This is a completely reworked version of the original picket plot. The most impo
 In terms of mostly hidden functionality, picket plots can now be plotted vertically as well as horizontally: in principle, a  small change, but a clean implementation requires some re-arrangement of the code. What I have done here is to separate the set-up of the plot and the actual drawing as far as possible, so that essentially, I only have to swap coordinates at one place, if required. A really clean implementation would split the function into a generating function and a plotting function. Note that internally, we work with matrices with two columns for x- and y-coordinates, even for single points.
 
 <<picketPlot_Def>>=
-picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, add=FALSE, horizontal=TRUE, control=list()) 
+picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, control=list()) 
 #
 # Name: picketPlot (looks like a picket fence with holes, and sounds like the
 #                   pocketplot in geostatistics)
@@ -744,11 +744,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, add=TRUE)
+        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, add=TRUE, horizontal=FALSE)
+        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
