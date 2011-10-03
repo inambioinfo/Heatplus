@@ -363,27 +363,39 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
 
 {{{\subsection{Defining clean breaks}
 
-I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from image, with the trim and equalize modifiers. Ordinarily, there would not be much need for more sophistication than that, but if we want a plausible method for expression sets, we do not want to have to extract the expression matrix, apply a function, pass it in again with the pheno data etc., so having some mechanism at least for the method makes sense. Preferably we want to have some useful shorthands for different types of classes, e.g. equal widths around zero (useful for correlation matrices and residuals, too).
+I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from \Rfunction{image}, with the \Rfunarg{trim} and \Rfunarg{equalize} modifiers. Ordinarily, there would not be much need for more sophistication than that, but if we want a plausible method for expression sets, we do not want to have to extract the expression matrix, apply a function, pass it in again with the pheno data etc., so having some mechanism at least for the method makes sense. Preferably, we want to have some useful shorthands for different types of classes; especially equal widths around zero should be the default to go with row-centering and -scaling.
 
-So we have an argument \Rfunarg{breaks} that allows the following specification:
+The heatmap functions should have an argument \Rfunarg{breaks} that extends the functionality of \Rfunction{cut}:
 \begin{itemize}
-\item a vector containing the actual breaks,
-\item a number indicating the number of classes, together with an optional type: either equal widths or equal counts.
+\item if \Rfunarg{breaks} is a vector, it is assumed that these are manually specified breaks and used as given;
+\item if \Rfunarg{breaks} is a number, it is taken to be the number of classes;
+how this is translated, depends on the argument \Rfunarg{type.breaks}, which can specify equal lengths or equal counts for intervals, or equal lengths centered on zero.
 \end{itemize}
-If unspecified, the number of classes can be calculated using one of the helper functions for \Rfunction{hist} like \Rfunarg{nclass.Sturges}, and the type can depend on the skewness of the data. We wrap this into a service function that returns the classes plus some meta-information that may be useful for plotting the legend.
 
+Equal-lengths-centered around zero only makes sense when we have negative minimum and positive maximum (otherwise, it's just equal lengths). So for a given number $n$ of classes, we get $k_1$ classes below and $k_2$ classes above zero, with unknown length $l$ 
+\[
+|\min| = k_1 \times l \qquad \max = k_2 \times l \qquad k_1 + k_2 \leq n
+\]
+
+
+
+If unspecified, the number of classes can be calculated using one of the helper functions for \Rfunction{hist} like \Rfunarg{nclass.Sturges}, and the type can depend on the skewness of the data. We wrap this into a service function that returns the breaks:
 <<findBreaks_Def>>=
-findBreaks = function(x, n, type)
+findBreaks = function(x, n, type=c("zero.centered", "equal.length", "equal.counts"))
 {
-    if (missing(type)) type = "length"
-    if (missing(n))    n = nclass.Sturges(x)
-    if (type=="length") {
+    type = match.arg(type)
+    if (missing(n)) n = nclass.Sturges(x)
+    if (type=="equal.length") {
+        ## as seen in cut.default
         rx = range(x, na.rm=TRUE)    
         dx = diff(rx)
         if (dx==0) dx = abs(rx[1])
         brks = seq.int(from=rx[1]-dx/1000, to=rx[2]+x/1000, length.out=n+1)
-    } else if (type=="count") {
+    } else if (type=="equal.count") {
         brks = quantile(x, (0:n)/n, na.rm=TRUE)
+    } else if (type=="zero.centered") {
+        
+        
     } else stop("Invalid type argument")
     attr(brks, "type") = type
     brks
@@ -644,6 +656,9 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
         x2 = rank(x2, na.last=if (na.rm) TRUE else NA)
         attributes(x2) = att
     }
+    
+    ## This where the definition of the breaks (and corresponding colors)
+    ## should go
     
     ## Generate the dendrograms, if required; re-indexes in any cases
     ## We could put some sanity checks on the dendrograms in the else-branches
