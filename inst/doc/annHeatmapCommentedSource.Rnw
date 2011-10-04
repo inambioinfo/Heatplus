@@ -361,46 +361,52 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
 
 }}}
 
-{{{\subsection{Defining clean breaks}
+{{{\subsection{Defining nice breaks}
 
-I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from \Rfunction{image}, with the \Rfunarg{trim} and \Rfunarg{equalize} modifiers. Ordinarily, there would not be much need for more sophistication than that, but if we want a plausible method for expression sets, we do not want to have to extract the expression matrix, apply a function, pass it in again with the pheno data etc., so having some mechanism at least for the method makes sense. Preferably, we want to have some useful shorthands for different types of classes; especially equal widths around zero should be the default to go with row-centering and -scaling.
+I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from \Rfunction{image}, with the \Rfunarg{trim} and \Rfunarg{equalize} modifiers. This, of course, will not do: we want nice breaks (round numbers), we want our equidistant classes centered around zero, and we want to be able to specifiy a set of breaks of our own choosing. 
 
-The heatmap functions should have an argument \Rfunarg{breaks} that extends the functionality of \Rfunction{cut}:
-\begin{itemize}
-\item if \Rfunarg{breaks} is a vector, it is assumed that these are manually specified breaks and used as given;
-\item if \Rfunarg{breaks} is a number, it is taken to be the number of classes;
-how this is translated, depends on the argument \Rfunarg{type.breaks}, which can specify equal lengths or equal counts for intervals, or equal lengths centered on zero.
-\end{itemize}
+This is achieved via the argument \Rfunarg{breaks} that works a little bit like the argument of the same name for function \Rfunction{cut}: a vector specifies the actual breaks, and a single number is interpreted as the desired number of equidistant classes. However, we do not just chop up the range of the values into a suitable number of classes, we use the function \Rfunction{pretty} to get nice round breaks; the number of resulting intervals can very slightly from the suggested number. 
 
-Equal-lengths-centered around zero only makes sense when we have negative minimum and positive maximum (otherwise, it's just equal lengths). So for a given number $n$ of classes, we get $k_1$ classes below and $k_2$ classes above zero, with unknown length $l$ 
-\[
-|\min| = k_1 \times l \qquad \max = k_2 \times l \qquad k_1 + k_2 \leq n
-\]
+For the special case that we have both negative and positive numbers, we make sure that zero is one of the breaks, so that the intervals extend somewhat symmetrically around zero. For the default behaviour of standardizing the rows of the data matrix, this is eminently reasonable. 
 
-
-
-If unspecified, the number of classes can be calculated using one of the helper functions for \Rfunction{hist} like \Rfunarg{nclass.Sturges}, and the type can depend on the skewness of the data. We wrap this into a service function that returns the breaks:
+All of this is packed into a helper function, of course:
 <<findBreaks_Def>>=
-findBreaks = function(x, n, type=c("zero.centered", "equal.length", "equal.counts"))
+niceBreaks = function(xr, breaks)
 {
-    type = match.arg(type)
-    if (missing(n)) n = nclass.Sturges(x)
-    if (type=="equal.length") {
-        ## as seen in cut.default
-        rx = range(x, na.rm=TRUE)    
-        dx = diff(rx)
-        if (dx==0) dx = abs(rx[1])
-        brks = seq.int(from=rx[1]-dx/1000, to=rx[2]+x/1000, length.out=n+1)
-    } else if (type=="equal.count") {
-        brks = quantile(x, (0:n)/n, na.rm=TRUE)
-    } else if (type=="zero.centered") {
-        
-        
-    } else stop("Invalid type argument")
-    attr(brks, "type") = type
-    brks
+    ## If you want it, you get it
+    if (length(breaks) > 1) {
+        return(breaks)
+    }
+    ## Ok, so you proposed a number
+    ## Neg and pos?
+    if ( (xr[1] < 0) & (xr[2] > 0) ) {
+        xminAbs = abs(xr[1])
+        xmax    = xr[2]
+        nneg = max(round(breaks * xminAbs/(xmax+xminAbs)), 1)
+        npos = max(round(breaks * xmax/(xmax+xminAbs)), 1)
+        nbr  = pretty(c(xr[1], 0), nneg)
+        pbr  = pretty(c(0, xr[2]), npos)
+        ## Average of the proposed interval lengths,
+        ##  nice enough for us
+        diff = ( (nbr[2]-nbr[1]) + (pbr[2] - pbr[1]) ) / 2
+        nbr  = diff * ( (xr[1] %/% diff)  : 0 ) 
+        pbr  = diff * ( 1 : (xr[2] %/% diff + 1) )
+        breaks = c(nbr, pbr)
+    } else { ## only pos or negs
+        breaks = pretty(xr, breaks)
+    }
+    breaks
 }
 @
+
+Note that the user is free to specify breaks that do not cover the whole range of the data, in which case we could
+\begin{itemize}
+\item  replace values outside the breaks with the smallest or largest break (for display only, of course),
+\item cleverly indicate in the legend that there are more values beyond the indicated limits, by adding a $<$ or $>$ sign in the annotation.
+\end{itemize}
+This would neatly implement functionality comparable to the original \Rfunarg{trim}-argument, avoiding the problem of outliers compressing the display scale.
+
+Potentially, we may want use quantile-based breaks (i.e. equal counts instead of equal lengths), but this remains to be seen.
 
 }}}
 
