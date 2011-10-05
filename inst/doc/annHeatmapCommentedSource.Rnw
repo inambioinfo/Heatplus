@@ -361,9 +361,9 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
 
 }}}
 
-{{{\subsection{Defining nice breaks}
+{{{\subsection{Defining nice breaks with nice colors}
 
-I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from \Rfunction{image}, with the \Rfunarg{trim} and \Rfunarg{equalize} modifiers. This, of course, will not do: we want nice breaks (round numbers), we want our equidistant classes centered around zero, and we want to be able to specifiy a set of breaks of our own choosing. 
+\paragraph{Breaks} I find that the specification of the classes is entirely insufficient in the old version: essentially using the equidistant classes from \Rfunction{image}, with the \Rfunarg{trim} and \Rfunarg{equalize} modifiers. This, of course, will not do: we want nice breaks (round numbers), we want our equidistant classes centered around zero, and we want to be able to specifiy a set of breaks of our own choosing. 
 
 This is achieved via the argument \Rfunarg{breaks} that works a little bit like the argument of the same name for function \Rfunction{cut}: a vector specifies the actual breaks, and a single number is interpreted as the desired number of equidistant classes. However, we do not just chop up the range of the values into a suitable number of classes, we use the function \Rfunction{pretty} to get nice round breaks; the number of resulting intervals can very slightly from the suggested number. 
 
@@ -407,6 +407,31 @@ Note that the user is free to specify breaks that do not cover the whole range o
 This would neatly implement functionality comparable to the original \Rfunarg{trim}-argument, avoiding the problem of outliers compressing the display scale.
 
 Potentially, we may want use quantile-based breaks (i.e. equal counts instead of equal lengths), but this remains to be seen.
+
+\paragraph{Colors} Once we have defined a nice set of breaks, we want to be able to specify the colors for the corresponding intervals. Again, we aim for convenience in case of the default situation of standardized data -- i.o.w. when we have breaks that are symmetric around zero, we want to have colors that are symmetric around zero, or more precisely, a color range that is symmetric around zero, whether or not the actual values are. E.g. in case of the classical green to black to red scale for (log) gene expression and data ranging from -2 to +3, we want to have black (with red or green tinge) in the center, full green at -3 and full red at +3; this means that there will be no full red in central plot, but we get a visual impression of the asymmetry in the data. (Note that this can be handled in different ways in the legend).
+
+On the other hand, we want to allow the user to specify \textit{exactly} the colors they feel are necessary. Therefore, colors can be specified via the argument \Rfunarg{col} in two ways:
+\begin{enumerate}
+\item as a vector of colors (generally through a call to a palette function as in e.g. \Robject{heat.colors(12)}),
+\item as the name of a palette function; in this case, the result will depend on whether or not the breaks are symmetric around zero: if not, we get the standard palette for the implied number of classes; if symmetric, we get the extended color space as outlined above.
+\end{enumerate}
+
+<<breakColors_Def>>=
+breakColors = function(breaks, colors)
+{
+
+}
+@
+
+We also offer a re-implementation of the green to black to red scale that a) actually goes from green to red (instead of the wrong way round) and b) keeps a red or green tinge for the "black" colors left and right of zero (equal number of classes only). This is of course just an updated version of the old \Rfunction{RGBColVec}:
+
+<<g2r.colors_Def>>=
+g2r.colors = function(n=12, min.tinge = 0.1)
+{
+
+
+}
+@
 
 }}}
 
