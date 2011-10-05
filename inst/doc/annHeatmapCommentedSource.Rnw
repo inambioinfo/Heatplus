@@ -417,19 +417,62 @@ On the other hand, we want to allow the user to specify \textit{exactly} the col
 \end{enumerate}
 
 <<breakColors_Def>>=
-breakColors = function(breaks, colors)
+breakColors = function(breaks, colors, center=0, tol=0.001)
 {
-
+    ## In case of explicit color definitions
+    nbreaks = length(breaks)
+    nclass  = nbreaks - 1
+    if (!is.function(colors)) {
+        ncolors = length(colors)
+        if (ncolors > nclass) {
+            warning("more colors than classes: ignoring ", ncolors-nclass, " last colors")
+            colors = colors[1:nclass]
+        } else if (nclass > ncolors) {
+            stop(nclass-ncolors, " more classes than colors defined")
+        }
+    } else {
+        ## Are the classes symmetric and of same lengths?
+        clens = diff(breaks)
+        aclen = mean(clens)
+        if (aclen==0) stop("Dude, your breaks are seriously fucked up!")
+        relerr = max((clens-aclen)/aclen)
+        if ( (center %in% breaks) & (relerr < tol) ) { ## yes, symmetric
+            ndxcen = which(breaks==center)
+            kneg = ndxcen -1 
+            kpos = nbreaks - ndxcen
+            kmax = max(kneg, kpos)
+            colors = colors(2*kmax)
+            if (kneg < kpos) {
+                colors = colors[ (kpos-kneg+1) : (2*kmax) ]
+            } else if (kneg > kpos) {
+                colors = colors[ 1 : (2*kmax - (kneg-kpos)) ]
+            }
+        } else {                                      ## no, not symmetric
+            colors = colors(nclass)
+        }
+    }
+    colors
 }
 @
 
 We also offer a re-implementation of the green to black to red scale that a) actually goes from green to red (instead of the wrong way round) and b) keeps a red or green tinge for the "black" colors left and right of zero (equal number of classes only). This is of course just an updated version of the old \Rfunction{RGBColVec}:
 
 <<g2r.colors_Def>>=
-g2r.colors = function(n=12, min.tinge = 0.1)
+g2r.colors = function(n=12, min.tinge = 0.33)
 {
-
-
+    k <- trunc(n/2)
+    if (2 * k == n) {
+        g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, k))
+        r <- c(rep(0, k), seq(min.tinge, 1, length = k))
+        colvec <- rgb(r, g, rep(0, 2 * k))
+    }
+    else {
+        g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, 
+            k + 1))
+        r <- c(rep(0, k + 1), seq(min.tinge, 1, length = k))
+        colvec <- rgb(r, g, rep(0, 2 * k + 1))
+    }
+    colvec
 }
 @
 
@@ -441,7 +484,7 @@ Here we have several options that could be considered (and may even be implement
 \begin{itemize}
 \item a simple strip with an axis, indicating the range of values and colors, as in the old heatmaps;
 \item a stack of colored rectangles, indicating the different colors, and giving the class limits (i.e. the size of the color rectangle is not proportional to the class width);
-\item some variant of th cool histogram legend they have in \Rfunction{heatmap2}.
+\item some variant of the cool histogram legend they have in \Rfunction{heatmap2}.
 \end{itemize}
 
 <<doLegend_Def>>=
@@ -450,9 +493,9 @@ doLegend = function(breaks, col, side)
     zval = ( breaks[-1] + breaks[-length(breaks)] ) / 2
     z  = matrix(zval, ncol=1)
     if (side %in% c(1,3)) {
-        image(x=zval, y=1, z=z, xaxt="n", yaxt="n", col=col, breaks=breaks , xaxs="i")
+        image(x=zval, y=1, z=z, xaxt="n", yaxt="n", col=col, breaks=breaks , xaxs="i", xlab="", ylab="")
     } else {
-        image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col, breaks=breaks, yaxs="i")
+        image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col, breaks=breaks, yaxs="i", xlab="", ylab="")
     }        
     axis(side, las=1)
 
@@ -629,7 +672,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 This is the actual workhorse underlying the different functions for generating standard plots. It allows any combination of row and column dendrograms and annotations, and has a consistent, if not very friendly interface, based on lists within lists, as described above. The point of this function is to offer an expert access to the bells and whistles in a sane manner; the casual user will prefer one of the wrapping functions creating e.g. a standard annotated heatmap with column annotation and without row dendrogram.
 
 <<annHeatmap2_Def>>=
-annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=9, col=heat.colors, legend=FALSE)
+annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=256, col=g2r.colors, legend=FALSE)
 #
 # Name: annHeatmap2
 # Desc: a (possibly doubly) annotated heatmap
@@ -676,10 +719,11 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     
     ## Construct the breaks and colors for display
     breaks = niceBreaks(range(x2), breaks)
-    col    = col(length(breaks)-1)
+    col    = breakColors(breaks, col)
     
     ## Generate the dendrograms, if required; re-indexes in any cases
     ## We could put some sanity checks on the dendrograms in the else-branches
+    ## FIXME: store the names of the functions, not the functions in the object
     dendrogram$Row = within(dendrogram$Row, 
         if (!inherits(dendro, "dendrogram")) {
             dendro = clustfun(distfun(x))

@@ -4,4 +4,4 @@ importFrom(grDevices, col2rgb, gray, heat.colors, rainbow, rgb)
 importFrom(stats, as.dendrogram, cutree, dist, hclust, loess,
            order.dendrogram, predict, quantile, reorder)
 
-export(heatmap_2, heatmap_plus, RainbowPastel, RGBColVec, oldCutplot.dendrogram, oldPicketplot, convAnnData, picketPlot, annHeatmap2, regHeatmap, annHeatmap, annHeatmap.default, regHeatmap.default, plot.annHeatmap)
+export(heatmap_2, heatmap_plus, RainbowPastel, RGBColVec, oldCutplot.dendrogram, oldPicketplot, convAnnData, picketPlot, annHeatmap2, regHeatmap, annHeatmap, annHeatmap.default, regHeatmap.default, plot.annHeatmap, g2r.colors)
