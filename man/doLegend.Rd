@@ -3,68 +3,41 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Add a legend to the heatmap}
 \description{
-Add a legend to the heatmap
+Add a simple legend in form of a color bar to a plot.
 }
 \usage{
 doLegend(r, col, side)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{r}{
-%%     ~~Describe \code{r} here~~
+    \item{r}{a vector of length two, giving the minimum and maximum value for the legend (think range).
 }
-  \item{col}{
-%%     ~~Describe \code{col} here~~
+  \item{col}{a vector of colors to be shown.
 }
-  \item{side}{
-%%     ~~Describe \code{side} here~~
+  \item{side}{integer between 1 and 4, indicating on which side of the main plot the legend is supposed to be drawn. Standard interpretation: 1 = below, continuing clock-wise.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+    This is an extremely simple way of giving a visual impression of what numerical values correspond to a given color. The range of values given by \code{r} is split into as many classes of equal length as there are colors in \code{col}. The actual plot is done via a call to \code{\link{image}} and \code{\link{axis}}.
 }
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+\value{The locations of the ticks returned by the call to \code{\link{axis}}
 }
-\references{
-%% ~put references to the literature/web site here ~
+\author{Alexander Ploner \email{Alexander.Ploner@ki.se}
 }
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{plot.annHeatmap}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(r, col, side)
-{
-    nc = length(col)
-    zval = seq(r[1], r[2], length=nc)
-    z  = matrix(zval, ncol=1)
-    if (side \%in\% c(1,3)) {
-        image(x=zval, y=1, z=z, xaxt="n", yaxt="n", col=col)
-    } else {
-        image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col)
-    }        
-    axis(side, las=1)
-  }
+    ## Set up data
+    x = matrix(rnorm(100), nrow=10)
+    r = range(x)
+    ## Set up breaks and colors
+    brks = seq(r[1], r[2], 11)
+    cols = heat.colors(10)
+    
+    
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
+

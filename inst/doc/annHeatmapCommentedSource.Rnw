@@ -420,17 +420,17 @@ Here we have several options that could be considered (and may even be implement
 \end{itemize}
 
 <<doLegend_Def>>=
-doLegend = function(r, col, side)
+doLegend = function(breaks, col, side)
 {
-    nc = length(col)
-    zval = seq(r[1], r[2], length=nc)
+    zval = ( breaks[-1] + breaks[-length(breaks)] ) / 2
     z  = matrix(zval, ncol=1)
     if (side %in% c(1,3)) {
-        image(x=zval, y=1, z=z, xaxt="n", yaxt="n", col=col)
+        image(x=zval, y=1, z=z, xaxt="n", yaxt="n", col=col, breaks=breaks , xaxs="i")
     } else {
-        image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col)
+        image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col, breaks=breaks, yaxs="i")
     }        
     axis(side, las=1)
+
 }
 @
 
@@ -604,7 +604,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 This is the actual workhorse underlying the different functions for generating standard plots. It allows any combination of row and column dendrograms and annotations, and has a consistent, if not very friendly interface, based on lists within lists, as described above. The point of this function is to offer an expert access to the bells and whistles in a sane manner; the casual user will prefer one of the wrapping functions creating e.g. a standard annotated heatmap with column annotation and without row dendrogram.
 
 <<annHeatmap2_Def>>=
-annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), col=heat.colors(12), equalize=FALSE, trim, legend=FALSE)
+annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=9, col=heat.colors, legend=FALSE)
 #
 # Name: annHeatmap2
 # Desc: a (possibly doubly) annotated heatmap
@@ -648,23 +648,10 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
         sd = apply(x2, 2, sd, na.rm = TRUE)
         x2 = sweep(x2, 2, sd, "/")
     }
-    # More display magic - scae or trim, but generally not both
-    if (!missing(trim)) {
-        trim = min(trim[1], 1-trim[1])
-        lo = quantile(x2, trim, na.rm=TRUE) 
-        hi = quantile(x2, 1-trim, na.rm=TRUE)
-        x2[x2<lo] = lo
-        x2[x2>hi] = hi
-    }
-    # slightly dirty too - should not be used together with trim
-    if (equalize) {
-        att = attributes(x2)
-        x2 = rank(x2, na.last=if (na.rm) TRUE else NA)
-        attributes(x2) = att
-    }
     
-    ## This where the definition of the breaks (and corresponding colors)
-    ## should go
+    ## Construct the breaks and colors for display
+    breaks = niceBreaks(range(x2), breaks)
+    col    = col(length(breaks)-1)
     
     ## Generate the dendrograms, if required; re-indexes in any cases
     ## We could put some sanity checks on the dendrograms in the else-branches
@@ -715,7 +702,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## Generate the new object
     
     ## print, return invisibly
-    ret = list(data=list(x=x, x2=x2, rowInd=rowInd, colInd=colInd, col=col), dendrogram=dendrogram, cluster=cluster, annotation=annotation, labels=labels, layout=layout, legend=legend)
+    ret = list(data=list(x=x, x2=x2, rowInd=rowInd, colInd=colInd, breaks=breaks, col=col), dendrogram=dendrogram, cluster=cluster, annotation=annotation, labels=labels, layout=layout, legend=legend)
     class(ret) = "annHeatmap"
     ret
 
@@ -743,7 +730,7 @@ plot.annHeatmap = function(x, ...)
     if (doClab) mmar[x$labels$Col$side] = x$labels$Col$nrow
     with(x$data, {
         par(mar=mmar)
-        image(1:nc, 1:nr, t(x2), axes = FALSE, xlim = c(0.5, nc + 0.5), ylim = c(0.5, nr + 0.5), xlab = "", ylab = "", col=col, ...)    
+        image(1:nc, 1:nr, t(x2), axes = FALSE, xlim = c(0.5, nc + 0.5), ylim = c(0.5, nr + 0.5), xlab = "", ylab = "", col=col, breaks=breaks, ...)    
     })
     with (x$labels, {
         if (doRlab) axis(Row$side, 1:nr, las = 2, line = -0.5, tick = 0, labels = Row$labels, cex.axis = Row$cex)
@@ -775,18 +762,16 @@ plot.annHeatmap = function(x, ...)
     ## Plot a legend, as required
     if (x$legend) {
         if (x$layout$legend.side %in% c(1,3)) {
-            par(mar=c(2, mmar[2], 2, mmar[4]))
+            par(mar=c(2, mmar[2]+2, 2, mmar[4]+2))
         } else {
-            par(mar=c(mmar[1], 2, mmar[3], 2))            
+            par(mar=c(mmar[1]+2, 2, mmar[3]+2, 2))            
         }        
-        doLegend(range(x$data$x, na.rm=TRUE), x$layout$legend.side, col=x$data$col)
+        doLegend(x$data$breaks, col=x$data$col, x$layout$legend.side)
     }    
     
     invisible(x)    
     
 }
-
-
 @
 
 }}}
