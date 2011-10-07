@@ -609,7 +609,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 @
 
 
-FIXME: does nothing for singleton clusters!!
+Compared to the previous version, this one checks whether the propose cutting height is greater than the tree height (in which case it just plots the tree and moves on), and deals correctly with singleton clusters. Note that the treatment of singletons is not great, as it colors the corresponding branch all the way up to the specified cutting height, while non-singletons are only colored up to the fork; this will have to do for now, but is clearly a FIXME. 
 <<cutplot_dendrogam_Def>>=
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
@@ -631,9 +631,15 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 {
     ## If there is no cutting, we plot and leave
     if (missing(h) | is.null(h)) {
-        return(plot(x, leaflab=leaflab, horiz=horiz, ...))
+        return(plot(x, leaflab=leaflab, horiz=horiz, edgePar=list(lwd=lwd), ...))
     }
-    
+    ## If cut height greater than tree, don't cut, complain and leave
+    treeheight = attr(x, "height")
+    if (h >= treeheight) {
+        warning("cutting height greater than tree height ", treeheight, ": tree uncut")
+        return(plot(x, leaflab=leaflab, horiz=horiz, edgePar=list(lwd=lwd), ...))
+    }
+            
     ## Some param processing
     if (missing(cluscol) | is.null(cluscol)) cluscol = RainbowPastel
     
@@ -648,14 +654,22 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
     if (is.function(cluscol)) {
        cluscol = cluscol(K)
     }
-    x1 = 1
+    left = 1
     for (k in 1:K) {
-        x2 = x1 + attr(x[[k]],"members")-1
-        pn(x1,x2, x[[k]], type="rectangular", center=FALSE, 
+        right = left + attr(x[[k]],"members")-1
+        if (left < right) {         ## not a singleton cluster 
+            pn(left, right, x[[k]], type="rectangular", center=FALSE, 
                  leaflab=leaflab, nodePar=NULL, edgePar=list(lwd=lwd, col=cluscol[k]), horiz=horiz)
-        x1 = x2 + 1
+        } else if (left == right) { ## singleton cluster
+            if (!horiz) {
+                segments(left, 0, left, h, lwd=lwd, col=cluscol[k])
+            } else {
+                segments(0, left, h, left, lwd=lwd, col=cluscol[k])
+            }
+        } else stop("this totally should not have happened")
+        left = right + 1
    }
- 
+
 }
 @
 
@@ -821,11 +835,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp)
+        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE)
+        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
     }
 
     ## Plot a legend, as required
