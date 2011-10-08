@@ -192,8 +192,9 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         grp0 = cbind(grpcoord[1:gg], rep(0, gg))
         grp1 = cbind(grpcoord[2:(gg+1)], rep(totalh, gg))
         if (missing(grpcol)) {
-            grpcol=RainbowPastel(gg)
+            grpcol=RainbowPastel
         }
+        if (is.function(grpcol)) grpcol = grpcol(gg)
     }
 
     # Loop over vars and fill in the panels
@@ -309,7 +310,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
 ###################################################
 ### chunk number 6: findBreaks_Def
 ###################################################
-#line 374 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 375 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 niceBreaks = function(xr, breaks)
 {
     ## If you want it, you get it
@@ -341,7 +342,7 @@ niceBreaks = function(xr, breaks)
 ###################################################
 ### chunk number 7: breakColors_Def
 ###################################################
-#line 420 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 421 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 breakColors = function(breaks, colors, center=0, tol=0.001)
 {
     ## In case of explicit color definitions
@@ -383,14 +384,15 @@ breakColors = function(breaks, colors, center=0, tol=0.001)
 ###################################################
 ### chunk number 8: g2r.colors_Def
 ###################################################
-#line 461 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 462 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 g2r.colors = function(n=12, min.tinge = 0.33)
 {
     k <- trunc(n/2)
     if (2 * k == n) {
         g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, k))
         r <- c(rep(0, k), seq(min.tinge, 1, length = k))
-        colvec <- rgb(r, g, rep(0, 2 * k))
+        colvec <- rgb(
+        r, g, rep(0, 2 * k))
     }
     else {
         g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, 
@@ -405,7 +407,7 @@ g2r.colors = function(n=12, min.tinge = 0.33)
 ###################################################
 ### chunk number 9: doLegend_Def
 ###################################################
-#line 491 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 493 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 doLegend = function(breaks, col, side)
 {
     zval = ( breaks[-1] + breaks[-length(breaks)] ) / 2
@@ -416,14 +418,13 @@ doLegend = function(breaks, col, side)
         image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col, breaks=breaks, yaxs="i", xlab="", ylab="")
     }        
     axis(side, las=1)
-
 }
 
 
 ###################################################
 ### chunk number 10: convAnnData_Def
 ###################################################
-#line 513 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 514 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 convAnnData = function(x, nval.fac=3)
 {
     if (is.null(x)) return(NULL)
@@ -441,7 +442,7 @@ convAnnData = function(x, nval.fac=3)
 ###################################################
 ### chunk number 11: cut.dendrogram_Def
 ###################################################
-#line 536 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 537 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 cutree.dendrogram = function(x, h)
 {
     # Cut the tree, get the labels
@@ -467,7 +468,7 @@ cutree.dendrogram = function(x, h)
 ###################################################
 ### chunk number 12: getLeaves_Def
 ###################################################
-#line 561 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 562 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 getLeaves = function(x)
 {
     unlist(dendrapply(x, function(x) attr(x, "label")))
@@ -477,7 +478,7 @@ getLeaves = function(x)
 ###################################################
 ### chunk number 13: print.annHeatmap_Def
 ###################################################
-#line 575 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 576 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 print.annHeatmap = function(x, ...)
 {
     cat("annotated Heatmap\n\n")
@@ -492,7 +493,7 @@ print.annHeatmap = function(x, ...)
 ###################################################
 ### chunk number 14: RainbowPastel_Def
 ###################################################
-#line 594 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 595 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 RainbowPastel =  function (n, blanche=200, ...)
 #
 # Name: RainbowPastel
@@ -513,7 +514,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 ###################################################
 ### chunk number 15: cutplot_dendrogam_Def
 ###################################################
-#line 614 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 615 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
 # Name: cutplot.dendrogram
@@ -579,7 +580,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 ###################################################
 ### chunk number 16: annHeatmap2_Def
 ###################################################
-#line 689 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 690 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=256, col=g2r.colors, legend=FALSE)
 #
 # Name: annHeatmap2
@@ -689,7 +690,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 ###################################################
 ### chunk number 17: plot.annHeatmap_Def
 ###################################################
-#line 802 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 803 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 plot.annHeatmap = function(x, ...)
 {
     ## Set up the layout
@@ -751,7 +752,7 @@ plot.annHeatmap = function(x, ...)
 ###################################################
 ### chunk number 18: Generics_Def
 ###################################################
-#line 871 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 872 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
 
@@ -759,7 +760,7 @@ annHeatmap = function(x, ...) UseMethod("annHeatmap")
 ###################################################
 ### chunk number 19: regHeatmap_Def
 ###################################################
-#line 881 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 882 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=NULL, cluster=NULL,  labels=labels, legend=legend, ...)
@@ -770,7 +771,7 @@ regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, 
 ###################################################
 ### chunk number 20: annHeatmap_Def
 ###################################################
-#line 894 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 895 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=list(Col=list(data=annotation, fun=picketPlot)), cluster=cluster,  labels=labels, legend=TRUE, ...)
@@ -781,7 +782,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
 ###################################################
 ### chunk number 21: annHeatmapExpressionSet_Def
 ###################################################
-#line 906 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 907 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.ExpressionSet =function(x, ...)
 {
     expmat = exprs(x)

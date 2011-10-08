@@ -245,8 +245,9 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         grp0 = cbind(grpcoord[1:gg], rep(0, gg))
         grp1 = cbind(grpcoord[2:(gg+1)], rep(totalh, gg))
         if (missing(grpcol)) {
-            grpcol=RainbowPastel(gg)
+            grpcol=RainbowPastel
         }
+        if (is.function(grpcol)) grpcol = grpcol(gg)
     }
 
     # Loop over vars and fill in the panels
