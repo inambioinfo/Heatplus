@@ -1,9 +1,8 @@
 \name{cutplot.dendrogram}
 \alias{cutplot.dendrogram}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot a dendrogram in different colors}
 \description{
-Plot a dendrogram in different colors
+Plot a dendrogram, optionally with different colors for all sub-dendrograms below a certain cutting height.
 }
 \usage{
 cutplot.dendrogram(x, h, cluscol, leaflab = "none", horiz = FALSE, lwd = 3, ...)

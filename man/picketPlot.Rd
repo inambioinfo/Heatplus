@@ -1,6 +1,5 @@
 \name{picketPlot}
 \alias{picketPlot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Display a data frame of annotation information}
 \description{
 Displays a data frame of both factor and numerical variables in parallel panels. Factors levels are indicated by black rectangles, using dummy variables for more than two levels. Numerical variables are shown as simple index plots with an optional loess smoother. Panels can be arranged horizontally or vertically, and different groups of subjects can be indicated through different background colors. 
@@ -33,8 +32,6 @@ picketPlot(x, grp = NULL, grpcol, grplabel = NULL, horizontal = TRUE, control = 
     Missing values are indicated by a box marking in \code{nacol} for factor values.
 }
 \value{Depending on data and arguments, the value of the last \code{axis} function call. Irrelevant, as this function is called for its side effect of producing a plot.}
-\author{
-Alexander Ploner \email{Alexander.Ploner@ki.se}}
 \seealso{
 \code{\link{annHeatmap2}}, \code{\link{convAnnData}}, \code{\link{par}} 
 }

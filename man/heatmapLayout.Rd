@@ -1,9 +1,8 @@
 \name{heatmapLayout}
 \alias{heatmapLayout}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Generate a layout for an (annotated) heatmap}
 \description{
-Generate a layout for an (annotated) heatmap
+    Generate a layout for an (annotated) heatmap. This function will generally not be called directly, but only via \code{annHeatmap2}.
 }
 \usage{
 heatmapLayout(dendrogram, annotation, leg.side = NULL, show = FALSE)
@@ -11,140 +10,40 @@ heatmapLayout(dendrogram, annotation, leg.side = NULL, show = FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{dendrogram}{
-%%     ~~Describe \code{dendrogram} here~~
+      A list with named entries \code{Row} and \code{Col}. Each of these is a list with a named entry \code{status}. If the value of \code{status} is the string \code{"yes"}, space will be set aside for drawing a row- and/or column dendrogram. 
 }
   \item{annotation}{
-%%     ~~Describe \code{annotation} here~~
+      A list with named entries \code{Row} and \code{Col}. Each of these is a list with a named entry \code{data}. If the value of \code{status} is not \code{NULL}, space will be set aside for a picket plot showing the row- and/or column annotation.
 }
   \item{leg.side}{
-%%     ~~Describe \code{leg.side} here~~
+      An integer indicating on where to reserve space for the legend: values 1-4 correspond to below, to the left, above and to the right, as in e.g. \code{axis}. For a value of \code{NULL}, the function provides a reasonable default where there is space left in the layout. For any other value, no space for a legend is put aside. 
 }
   \item{show}{
-%%     ~~Describe \code{show} here~~
+      A logical value; if \code{TRUE}, the layout defined by the arguments is displayed graphically.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+    Space for plots is reserved via the \code{layout} mechanism. The function starts with an empty maximum layout, fills in the plot, dendrograms, annotation plots and legend as required, and compresses the resulting layout by removing empty slots.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    A list with the following entries:
+    \item{plot }{A matrix describing the plot layout; see \code{layout}}
+    \item{width }{relative widths of plots (i.e. columns)}
+    \item{height }{relative heights of plots (i.e. rows)}
+    \item{legend.side }{side where to draw the legend}
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{annHeatmap2}}, \code{\link{picketPlot}}, \code{\link{layout}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(dendrogram, annotation, leg.side=NULL, show=FALSE)
-{
-    ## Start: maximum matrix, 5 x 5, all zero
-    ## Names for nice display post ante
-    ll = matrix(0, nrow=5, ncol=5)
-    ll.width = ll.height = rep(0, 5)
-    cnt = 1
-    rownames(ll) = c("leg3", "colDendro","image", "colAnn", "leg1")
-    colnames(ll) = c("leg2", "rowDendro","image", "rowAnn", "leg4")
- 
-    ## The main plot
-    ll[3,3] = cnt
-    ll.width[3] = ll.height[3] = 5
-    cnt = cnt+1
-    ## The column dendrogram
-    if (dendrogram$Col$status=="yes") {
-        ll[2, 3] = 2
-        ll.width[3]  = 5
-        ll.height[2] = 2
-        cnt = cnt+1
-    }
-    ## The row dendrogram
-    if (dendrogram$Row$status=="yes") {
-        ll[3, 2] = cnt
-        ll.width[2]  = 2
-        ll.height[3] = 5
-        cnt = cnt+1
-    }
-    # Column annotation
-    if (!is.null(annotation$Col$data)) {
-        ll[4, 3] = cnt
-        ll.width[3] = 5
-        ll.height[4] = 2
-        cnt = cnt+1
-    }
-    ## Row annotation
-    if (!is.null(annotation$Row$data)) {
-        ll[3, 4] = cnt
-        ll.width[4]  = 2
-        ll.height[3] = 5
-        cnt = cnt+1
-    }
-    ## Legend: if no pref specified, go for empty, if possible
-    if (is.null(leg.side)) {
-        if (dendrogram$Row$status != "yes") {
-            leg.side = 2
-        } else if (is.null(annotation$Row$data)) {
-            leg.side = 4
-        } else if (is.null(annotation$Col$data)) {
-            leg.side = 1
-        } else if (dendrogram$Col$status != "yes") {
-            leg.side = 3
-        } else {
-            leg.side = 4
-        }
-    }
-    ## Add the legend space
-    if (leg.side==1) {
-        ll[5,3] = cnt
-        ll.width[3] = 5
-        ll.height[5] = 1
-    } else if (leg.side==2) {
-        ll[3,1] = cnt
-        ll.width[1] = 1
-        ll.height[3] = 5
-    } else if (leg.side==3) {
-        ll[1,3] = cnt
-        ll.width[3]  = 5
-        ll.height[1] = 1
-    } else if (leg.side==4) {
-        ll[3,5] = cnt
-        ll.width[5]  = 1
-        ll.height[3] = 5
-    }
-    
-    ## Compress
-    ndx = rowSums(ll)!=0
-    ll  = ll[ndx, ]
-    ll.height = ll.height[ndx]
-    ndx = colSums(ll)!=0
-    ll  = ll[, ndx]
-    ll.width = ll.width[ndx]
-    ## Do it - show it
-    if (show) {
-        layout(ll, width=ll.width, height=ll.height, respect=TRUE)            
-        layout.show(max(ll))
-    }
-    return(list(plot=ll, width=ll.width, height=ll.height, legend.side=leg.side))
-  }
+    ## Heatmap with column dendrogram, column annotation, default legend
+    dnd = list(Row=list(status="no"), Col=list(status="yes"))
+    ann = list(Row=list(data=NULL), Col=list(data=1))
+    ## 1 = heatmap, 2=dendrogram, 3=annotation, 4=legend
+    ll = heatmapLayout(dendrogram=dnd, annotation=ann, leg.side=NULL, show=TRUE)
+    ll
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ utilities }
+

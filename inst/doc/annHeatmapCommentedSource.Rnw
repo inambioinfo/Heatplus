@@ -464,7 +464,8 @@ g2r.colors = function(n=12, min.tinge = 0.33)
     if (2 * k == n) {
         g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, k))
         r <- c(rep(0, k), seq(min.tinge, 1, length = k))
-        colvec <- rgb(r, g, rep(0, 2 * k))
+        colvec <- rgb(
+        r, g, rep(0, 2 * k))
     }
     else {
         g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, 
@@ -498,7 +499,6 @@ doLegend = function(breaks, col, side)
         image(x=1, y=zval, z=t(z), xaxt="n", yaxt="n", col=col, breaks=breaks, yaxs="i", xlab="", ylab="")
     }        
     axis(side, las=1)
-
 }
 @
 
@@ -609,7 +609,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 @
 
 
-Compared to the previous version, this one checks whether the propose cutting height is greater than the tree height (in which case it just plots the tree and moves on), and deals correctly with singleton clusters. Note that the treatment of singletons is not great, as it colors the corresponding branch all the way up to the specified cutting height, while non-singletons are only colored up to the fork; this will have to do for now, but is clearly a FIXME. 
+Compared to the previous version, this one checks whether the propose cutting height is greater than the tree height (in which case it just plots the tree and moves on), and deals correctly with singleton clusters. Note that the treatment of singletons is not great, as it colors the corresponding branch all the way up to the specified cutting height, while non-singletons are only colored up to the fork; this will have to do for now, but is clearly a FIXME (technically, coloring already the trunk above the cut sounds feasible). 
 <<cutplot_dendrogam_Def>>=
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #

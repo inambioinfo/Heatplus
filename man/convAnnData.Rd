@@ -16,8 +16,6 @@ convAnnData(x, nval.fac = 3)
 \details{Logical variables are converted to factors. So are numerical variables with less than \code{nval.fac} unique values.
 }
 \value{\code{convAnnData} returns the converted data frame.}
-\author{
-Alexander Ploner <Alexander.Ploner@ki.se}
 \seealso{\code{\link{annHeatmap2}}}
 \examples{
 data(mtcars)
