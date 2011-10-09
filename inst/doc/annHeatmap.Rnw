@@ -1,0 +1,220 @@
+%\VignetteIndexEntry{Examples of annotated and regular heatmaps}
+%\VignetteDepends{}
+%\VignetteKeywords{microarray, visualization}
+%\VignettePackage{Heatplus}
+\documentclass[12pt]{article}
+
+\usepackage[authoryear,round]{natbib}
+\usepackage{url}
+\usepackage{Sweave}
+
+%% Paragraphs w/o indent
+\setlength{\parskip}{0.7ex plus0.1ex minus0.1ex}
+\setlength{\parindent}{0em}
+
+%% The options
+\SweaveOpts{eps=FALSE, prefix.string=annHeatmap, width=8, height=8} 
+
+%% Other people's markup
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\texttt{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+
+ \begin{document}
+
+\title{Creating heatmaps using package \Rpackage{Heatplus}}
+\author{Alexander Ploner\\
+Medical Epidemiology \& Biostatistics\\
+Karolinska Institutet, Stockholm\\
+email: \url{alexander.ploner@ki.se}}
+
+\maketitle
+\begin{abstract}
+The package \Rpackage{Heatplus} offers several functions for producing heatmaps, specifically annotated heatmaps that display extra information about samples and/or features (variables) in panels beside the main plot and the dendrograms. This documents demonstrates some basic applications to gene expression data.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%% Reduce output line width
+<<echo=FALSE, results=hide>>=
+options(width=75)
+@
+
+{{{\section{Setup}
+
+We use the example data from \Rpackage{Biobase} for demonstration:
+<<setup01>>=
+require(Biobase)
+data(sample.ExpressionSet)
+exdat = sample.ExpressionSet
+@
+
+We also generate a shortlist of genes that are associated with the phenotype \Robject{type}:
+<<setup02>>=
+require(limma)
+design1 = model.matrix( ~ type, data=pData(exdat))
+lm1 = lmFit(exprs(exdat), design1)
+lm1 = eBayes(lm1)
+geneID = topTable(lm1, coef=2, num=100, adjust="none", p.value=0.05)$ID
+length(geneID)
+@
+(Of course, this is only for the example's sake, as it does not account for multiple testing.)
+<<setup03>>=
+exdat2 = exdat[geneID,]
+@
+
+}}}
+
+{{{\section{Regular heatmaps}
+
+The function \Rfunction{regHeatmap} generates heatmaps without annotation. Apart from some display defaults, this is very similar to standard \Rfunction{heatmap}, but allows you to add a simple legend.
+
+Figure~\ref{fig1} shows the full example data with the default settings. Figure~\ref{fig2} shows the gene expression for the short list, with the legend move to the right, for simpler breaks of the intensity scale and a different palette. Figure~\ref{fig3} shows how different distance- and clustering functions can be passed in. Figure~\ref{fig4} shows how the lists of arguments can be used to specify different settings for row- and column dendrograms.
+
+{{{ %% Fig1: regular, defaults, full data
+\begin{figure}
+\begin{center}
+<<regHeatmap1, fig=TRUE>>=
+require(Heatplus)
+reg1 = regHeatmap(exprs(exdat))
+plot(reg1)
+@
+\end{center}
+\caption{Heatmap with row- and column dendrograms and a legend for 500 genes and 26 samples.\label{fig1}}
+\end{figure}
+}}}
+
+{{{ %% Fig2: regular, changes, subset
+\begin{figure}
+\begin{center}
+<<regHeatmap2, fig=TRUE>>=
+reg2 = regHeatmap(exprs(exdat2), legend=2, col=heat.colors, breaks=-3:3)
+plot(reg2)
+@
+\end{center}
+\caption{Heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. Legend placement, color scheme and intervals have been changed compared to the default\label{fig2}}
+\end{figure}
+}}}
+
+{{{ %% Fig3: regular, changes in dist/clust, subset
+\begin{figure}
+\begin{center}
+<<regHeatmap3, fig=TRUE>>=
+corrdist = function(x) as.dist(1-cor(t(x)))
+hclust.avl = function(x) hclust(x, method="average")
+reg3 = regHeatmap(exprs(exdat2), legend=2, dendrogram=list(clustfun=hclust.avl, distfun=corrdist))
+plot(reg3)
+@
+\end{center}
+\caption{Heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. Distance measure (correlation distance instead of Euclidean) and clustering method (average instead of complete linkage) for the dendrogram are changed compared to the default.\label{fig3}}
+\end{figure}
+}}}
+
+{{{ %% Fig4: regular, hide row dendrogram, subset
+\begin{figure}
+\begin{center}
+<<regHeatmap4, fig=TRUE>>=
+reg4 = regHeatmap(exprs(exdat2), legend=3, dendrogram=list(Col=list(status="hide")))
+plot(reg4)
+@
+\end{center}
+\caption{Heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. The column dendrogram is not shown, though the samples are still arranged as in Figure~\ref{fig2}.\label{fig4}}
+\end{figure}
+}}}
+
+
+}}}
+
+{{{\section{Annotated heatmaps}
+
+{{{ %% Fig5: annotated, defaults, full data
+\begin{figure}
+\begin{center}
+<<annHeatmap1, fig=TRUE>>=
+ann1 = annHeatmap(exprs(exdat), ann=pData(exdat))
+plot(ann1)
+@
+\end{center}
+\caption{Annotated heatmap with row- and column dendrograms and a legend for 500 genes and 26 samples.\label{fig5}}
+\end{figure}
+}}}
+
+{{{ %% Fig6: annotated, with cuts, subset
+\begin{figure}
+\begin{center}
+<<annHeatmap2, fig=TRUE>>=
+ann2 = annHeatmap(exprs(exdat2), ann=pData(exdat2), cluster=list(cuth=5000))
+plot(ann2)
+@
+\end{center}
+\caption{Annotated heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. The column dendrogram is cut at $h=5000$\label{fig6}}
+\end{figure}
+}}} 
+
+}}}
+
+{{{\section{Double-annotated heatmaps}
+
+We can also add annotation information about the features. These can be of all kinds: quality information, relationship with sample annotation, or membership in different pathways. Let's start with the median of the standard errors as a quality control measure:
+<<setupX1>>=
+SE = apply(get("se.exprs", assayData(exdat2)), 1, median)
+@
+Then we look at the correlation of the features with the variable \Robject{score} in the phenotype data, plus t-statistic and p-value:
+<<setupX2>>=
+CO = cor(t(exprs(exdat2)), pData(exdat2)$score)
+df = nrow(exdat2)-2
+TT = sqrt(df) * CO/sqrt(1-CO^2)
+PV = 2*pt(-abs(TT), df=df)
+@
+Finally, we want to see which of the features are associated with the GeneOntology category \textit{translation}:
+<<setupX3>>=
+require(hgu95av2.db)
+allGO = as.list(mget(featureNames(exdat2), hgu95av2GO))
+isTranslation = sapply(allGO, function(x) "GO:0006412" %in% names(x))
+@
+Let's put this into an annotation data frame:
+<<setupX4>>=
+annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTranslation)
+@
+
+{{{ %% Fig7: double annotated, default, subsets
+\begin{figure}
+\begin{center}
+<<annHeatmap4, fig=TRUE>>=
+ann4 = annHeatmap2(exprs(exdat2), ann=list(Row=list(data=pData(exdat2)), Col=list(data=annFeatures)))
+plot(ann4)
+@
+\end{center}
+\caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples.\label{fig7}}
+\end{figure}
+}}} 
+
+
+
+}}}
+
+{{{\section{Roadmap}
+
+The following improvements are planned for the next release:
+\begin{itemize}
+\item Better control over appearance of annotation panels: 
+\begin{itemize}
+\item Pass-through option for annotation data frame
+\item Optional inclusion/exclusion of reference levels for factor variables in the annotation data frames
+\item User-defined variable labels
+\end{itemize}
+\item Possiblity to switch off and/or pass through feature- and sample names for the central heatmap
+\item Improved precision for coloring the cutting height in dendrograms
+\item Specification of common clustering algorithms and distance measures via character codes (instead of costum wrapper functions for \Rfunction{hclust} and \Rfunction{dist}) 
+\end{itemize}
+The medium term goal is of course to add more specific methods for common Bioconductor classes and relevant objects, as well as providing convenience functions for including biological annotation data more easily, but there is no detailed road map for this yet.
+
+}}}
+
+\end{document}
+

@@ -129,10 +129,10 @@ heatmapLayout = function(dendrogram, annotation, leg.side=NULL, show=FALSE)
     
     ## Compress
     ndx = rowSums(ll)!=0
-    ll  = ll[ndx, ]
+    ll  = ll[ndx, , drop=FALSE]
     ll.height = ll.height[ndx]
     ndx = colSums(ll)!=0
-    ll  = ll[, ndx]
+    ll  = ll[, ndx, drop=FALSE]
     ll.width = ll.width[ndx]
     ## Do it - show it
     if (show) {
@@ -518,7 +518,7 @@ convAnnData = function(x, nval.fac=3)
     if (!is.null(nval.fac) & nval.fac>0) doConv = TRUE
     vv = colnames(x)
     for (v in vv) {
-        if (is.logical(x[,v])) x[,v] = factor(as.numerical(x[,v]))
+        if (is.logical(x[,v])) x[,v] = factor(as.numeric(x[,v]))
         if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) x[,v] = factor(x[,v])    
     }
     x
@@ -715,8 +715,15 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## Check values for the different lists
 
     
-    ## Generate the layout
-    layout = heatmapLayout(dendrogram, annotation)
+    ## Generate the layout: TRUE means default, FALSE means none
+    ## Otherwise, integer 1-4 indicates side
+    if (is.logical(legend)) {
+        if (legend) leg = NULL else leg = 0
+    } else {
+        if (!(legend %in% 1:4)) stop("invalid value for legend: ", legend)
+        else leg=legend
+    }
+    layout = heatmapLayout(dendrogram, annotation, leg.side=leg)
     
     ## Copy the data for display, scale as required
     x2 = x
