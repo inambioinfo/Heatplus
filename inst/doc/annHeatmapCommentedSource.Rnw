@@ -23,7 +23,7 @@
 \newcommand{\Rmethod}[1]{{\texttt{#1}}}
 \newcommand{\Rfunarg}[1]{{\texttt{#1}}}
 
- \begin{document}
+\begin{document}
 
 \title{Commented source code for regular and annotated heatmaps in package \texttt{Heatplus}}
 \author{Alexander Ploner\\
@@ -843,11 +843,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
+        x$annotation$Col$fun(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
+        x$annotation$Col$fun(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
     }
 
     ## Plot a legend, as required

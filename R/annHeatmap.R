@@ -86,10 +86,10 @@ heatmapLayout = function(dendrogram, annotation, leg.side=NULL, show=FALSE)
     
     ## Compress
     ndx = rowSums(ll)!=0
-    ll  = ll[ndx, ]
+    ll  = ll[ndx, , drop=FALSE]
     ll.height = ll.height[ndx]
     ndx = colSums(ll)!=0
-    ll  = ll[, ndx]
+    ll  = ll[, ndx, drop=FALSE]
     ll.width = ll.width[ndx]
     ## Do it - show it
     if (show) {
@@ -432,7 +432,7 @@ convAnnData = function(x, nval.fac=3)
     if (!is.null(nval.fac) & nval.fac>0) doConv = TRUE
     vv = colnames(x)
     for (v in vv) {
-        if (is.logical(x[,v])) x[,v] = factor(as.numerical(x[,v]))
+        if (is.logical(x[,v])) x[,v] = factor(as.numeric(x[,v]))
         if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) x[,v] = factor(x[,v])    
     }
     x
@@ -609,8 +609,15 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## Check values for the different lists
 
     
-    ## Generate the layout
-    layout = heatmapLayout(dendrogram, annotation)
+    ## Generate the layout: TRUE means default, FALSE means none
+    ## Otherwise, integer 1-4 indicates side
+    if (is.logical(legend)) {
+        if (legend) leg = NULL else leg = 0
+    } else {
+        if (!(legend %in% 1:4)) stop("invalid value for legend: ", legend)
+        else leg=legend
+    }
+    layout = heatmapLayout(dendrogram, annotation, leg.side=leg)
     
     ## Copy the data for display, scale as required
     x2 = x
@@ -690,7 +697,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 ###################################################
 ### chunk number 17: plot.annHeatmap_Def
 ###################################################
-#line 803 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 810 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 plot.annHeatmap = function(x, ...)
 {
     ## Set up the layout
@@ -727,11 +734,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
+        x$annotation$Col$fun(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
+        x$annotation$Col$fun(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
     }
 
     ## Plot a legend, as required
@@ -752,7 +759,7 @@ plot.annHeatmap = function(x, ...)
 ###################################################
 ### chunk number 18: Generics_Def
 ###################################################
-#line 872 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 879 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
 
@@ -760,7 +767,7 @@ annHeatmap = function(x, ...) UseMethod("annHeatmap")
 ###################################################
 ### chunk number 19: regHeatmap_Def
 ###################################################
-#line 882 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 889 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=NULL, cluster=NULL,  labels=labels, legend=legend, ...)
@@ -771,7 +778,7 @@ regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, 
 ###################################################
 ### chunk number 20: annHeatmap_Def
 ###################################################
-#line 895 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 902 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=list(Col=list(data=annotation, fun=picketPlot)), cluster=cluster,  labels=labels, legend=TRUE, ...)
@@ -782,7 +789,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
 ###################################################
 ### chunk number 21: annHeatmapExpressionSet_Def
 ###################################################
-#line 907 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 914 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.ExpressionSet =function(x, ...)
 {
     expmat = exprs(x)
