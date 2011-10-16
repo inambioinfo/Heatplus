@@ -188,6 +188,14 @@ annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTranslation)
 <<annHeatmap4, fig=TRUE>>=
 ann4 = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)))
 plot(ann4)
+ann4a = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
+ann4b = annHeatmap2(exprs(exdat2), ann=list(inclRef=FALSE, Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
+#plot(ann4b, widths=c(2,5,1), heights=c(2,5,1))
+ann1 = convAnnData(pData(exdat2), inclRef=FALSE)[, 3:1]
+colnames(ann1) = c("Score", "isControl", "isMale")
+ann2 = convAnnData(annFeatures, inclRef=FALSE)[, 3:1]
+colnames(ann2) = c("isTranslation", "isCorrelated", "SE")
+ann4c = annHeatmap2(exprs(exdat2), ann=list(asIs=TRUE, Col=list(data=ann1), Row=list(data=ann2)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
 @
 \end{center}
 \caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples.\label{fig7}}
