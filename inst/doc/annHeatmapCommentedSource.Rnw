@@ -187,12 +187,16 @@ extractArg = function(arglist, deflist)
 
 {{{\subsection{Adding annotation}
 
-This is a completely reworked version of the original picket plot. The most important differences from a user point of view are that a) we can have more than one covariate (non-factor), and b) we do not have to convert factors to binaries by hand. On the technical side, this is done by drawing everything in one plot window (instead of having a separate plot window for the covariate, as previously) and by using the \Rfunction{model.matrix} function to generate dummies.
+This is a completely reworked version of the original picket plot. The most important differences from a user point of view are that a) we can have more than one covariate (non-factor), and b) we do not have to convert factors to binaries by hand. On the technical side, this is done by drawing everything in one plot window (instead of having a separate plot window for the covariate, as previously). 
+
+We use the pre-processor function \Rfunction{convAnnData} to convert the data to a numerical matrix of binary indicators and numerical variables.
 
 In terms of mostly hidden functionality, picket plots can now be plotted vertically as well as horizontally: in principle, a  small change, but a clean implementation requires some re-arrangement of the code. What I have done here is to separate the set-up of the plot and the actual drawing as far as possible, so that essentially, I only have to swap coordinates at one place, if required. A really clean implementation would split the function into a generating function and a plotting function. Note that internally, we work with matrices with two columns for x- and y-coordinates, even for single points.
 
+The current implementation could be improved -- the function has been simplified by moving all of the pre-processing to \Rfunction{convAnnData}, but some of the internal looping does not take this into account and could be simplified.
+
 <<picketPlot_Def>>=
-picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, control=list()) 
+picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs=FALSE, control=list()) 
 #
 # Name: picketPlot (looks like a picket fence with holes, and sounds like the
 #                   pocketplot in geostatistics)
@@ -217,25 +221,27 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
               degree=1, cex.label=1.5, numfac=2)
     cc[names(control)] = control
     
+    ## Convert/check the data
+    x = convAnnData(x, asIs=asIs)
+    
     # Count variables, panels, types
     nsamp  = nrow(x)
-    nvar   = ncol(x)
-    npanel = sapply(x, function(x) if (is.factor(x)) nlevels(x) else 1)
-    bpanel = sapply(x, is.factor)
+    npanel = ncol(x)
+    bpanel = apply(x, 2, function(y) all(y[is.finite(y)] %in% c(0,1)) )
     
     # Compute panel heights, widths
     panelw = nsamp*(cc$boxw+2*cc$hbuff)
     panelh = cc$boxh+2*cc$vbuff
-    totalh = sum(npanel * panelh * ifelse(bpanel, 1, cc$numfac))
+    totalh = sum(panelh * ifelse(bpanel, 1, cc$numfac))
     LL = cbind(0, 0)
     UR = cbind(panelw, totalh)
-    
+     
     # Set up the x-values for a single panel
     xbase = seq(cc$hbuff, by=cc$boxw+2*cc$hbuff, length=nsamp)
     xcent = xbase + cc$boxw/2
     
     # if we get a cluster variable, we have to set differently colored 
-    # backgrounds; this assumes that the grp variable is sorted in the 
+    # backgrounds; this assumes that the  grp variable is sorted in the 
     # way it appears on the plot
     if (!is.null(grp)) {
         grp = as.integer(factor(grp, levels=unique(grp)))
@@ -253,22 +259,20 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
     # Loop over vars and fill in the panels
     panels = list()
     voff = 0
-    for (i in 1:nvar) {
+    for (i in 1:npanel) {
         if (bpanel[i]) {
             ## Coordinates
-            x0 = rep(xbase, npanel[i])
+            x0 = xbase
             x1 = x0+cc$boxw
-            y0 = voff + rep(seq(cc$vbuff, by=cc$boxh+2*cc$vbuff, length=npanel[i]), rep(nsamp, npanel[i]))
-            y1 = y0 + cc$boxh
-            ## Convert factor to matrix & set fill
-            naAction = attr(na.exclude(x[,i, drop=FALSE]), "na.action")
-            bindata = naresid(naAction, model.matrix(~x[,i]-1))
-            fill = ifelse(bindata==1, "black", "transparent")
+            y0 = voff + cc$vbuff
+            y1 = y0   + cc$boxh
+            ## Set fill
+            fill = ifelse(x[, i, drop=FALSE]==1, "black", "transparent")
             fill[is.na(fill)] = cc$nacol
-            label = paste(colnames(x)[i], "=", levels(x[,i]))
-            labcc = if (!is.null(label)) sort(unique((y0+y1)/2)) else NULL 
+            label = colnames(x)[i]
+            labcc = if (!is.null(label)) (y0+y1)/2 else NULL 
             panels[[i]] = list(ll=cbind(x0, y0), ur=cbind(x1, y1), fill=fill, label=label, labcc=labcc)
-            voff = voff + panelh*npanel[i]
+            voff = voff + panelh
         } else {
             xv = x[,i]
             rr = range(xv, na.rm=TRUE)
@@ -319,7 +323,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
             grp0 = h2v(grp0)
             grp1 = h2v(grp1)
         }
-        for (i in 1:nvar) {
+        for (i in 1:npanel) {
             panels[[i]][[1]] = h2v(panels[[i]][[1]])
             panels[[i]][[2]] = h2v(panels[[i]][[2]])
             panels[[i]]$labcc = panels[[i]]$labcc - totalh 
@@ -334,7 +338,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         rect(grp0[,1], grp0[,2], grp1[,1], grp1[,2], col=grpcol, border="transparent")
     }
     # Loop over vars and fill in the panels
-    for (i in 1:nvar) {
+    for (i in 1:npanel) {
         if (bpanel[i]) {
             ## Do the rectangles
             with(panels[[i]], rect(ll[,1], ll[,2], ur[,1], ur[,2], col=fill, border="transparent") )
@@ -356,7 +360,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         axis(grpaxis, grpcoord, label=FALSE, tcl=-1.5)
         axis(grpaxis, mids, label=grplabel, font=2, cex.axis=cc$cex.label, tick=FALSE)
     }                                
-
+    invisible(panels)
 }
 @
 
@@ -510,18 +514,51 @@ doLegend = function(breaks, col, side)
 
 An annotation data frame should have either factors or numerical variables. This requires e.g. conversion of logical values, but also numerically coded factors (say 0/1). We take a leave from Frank Harrel's book and convert numerical variables with fewer than some $c$ variables into factors.
 
+The binary indicators are provided courtesy of \Rfunction{model.matrix}. The argument \Rfunarg{inclRef} determines whether the reference level is included or not. I have also included a pass-through option \Rfunarg{asIs} that only checks the argument whether it is a proper numerical matrix and returns it unchanged if ok.
+
 <<convAnnData_Def>>=
-convAnnData = function(x, nval.fac=3)
+convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
 {
     if (is.null(x)) return(NULL)
+    if (asIs) {
+        if (is.matrix(x) & is.numeric(x)) return(x)
+        else stop("argument x not a numerical matrix, asIs=TRUE does not work")
+    }
+    
     x = as.data.frame(x)
     if (!is.null(nval.fac) & nval.fac>0) doConv = TRUE
     vv = colnames(x)
     for (v in vv) {
-        if (is.logical(x[,v])) x[,v] = factor(as.numeric(x[,v]))
-        if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) x[,v] = factor(x[,v])    
+        if (is.logical(x[,v])) {
+            x[,v] = factor(as.numeric(x[,v]))
+        }
+        if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) {
+            x[,v] = factor(x[,v])    
+        }
     }
-    x
+    ret  = NULL
+    ivar = 0
+    for (v in vv) {
+         if (is.factor(x[,v])) {
+            if (length(unique(x[,v])) > 1) {
+                naAction = attr(na.exclude(x[, v, drop=FALSE]), "na.action")
+                modMat   = model.matrix(~x[,v]-1)
+                if (!inclRef) modMat = modMat[ , -1, drop=FALSE]
+                binvar   = naresid(naAction, modMat)
+                colnames(binvar) = paste(v, "=", levels(x[,v])[if (!inclRef) -1 else TRUE], sep="")
+            } else {
+                ret = matrix(as.numeric(x[,v]), ncol=1)
+                colnames(ret) = paste(v, "=", levels(x[,v]), sep="")
+            }
+            ret = cbind(ret, binvar)
+            ivar = ivar + ncol(binvar)
+         } else {
+            ret = cbind(ret, x[,v])
+            ivar = ivar + 1
+            colnames(ret)[ivar] = v
+         }
+    }    
+    ret
 }
 @           
         
@@ -705,7 +742,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## See lattice:::xyplot.formula, modifyLists, lattice:::construct.scales
     def = list(clustfun=hclust, distfun=dist, status="yes", dendro=NULL)
     dendrogram = extractArg(dendrogram, def)
-    def = list(data=NULL, fun=picketPlot)
+    def = list(data=NULL, control=list(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
     def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
     cluster = extractArg(cluster, def)
@@ -787,8 +824,13 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
         })
 
     ## Process the annotation data frames (factor/numeric, re-sort?)
-    annotation$Row$data = convAnnData(annotation$Row$data)
-    annotation$Col$data = convAnnData(annotation$Col$data)
+    annotation$Row = within(annotation$Row, {
+        data = convAnnData(data, asIs=asIs, inclRef=inclRef)
+    })
+    annotation$Col = within(annotation$Col, {
+        data = convAnnData(data, asIs=asIs, inclRef=inclRef)
+    })
+
         
     ## Generate the new object
     
@@ -807,9 +849,11 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 This function takes the \Robject{annHeatmap} object generated from the user input and plots as required.
 
 <<plot.annHeatmap_Def>>=
-plot.annHeatmap = function(x, ...)
+plot.annHeatmap = function(x, widths, heights, ...)
 {
     ## Set up the layout
+    if (!missing(widths)) x$layout$width = widths
+    if (!missing(heights)) x$layout$height = heights    
     with(x$layout, layout(plot, width, height, respect=TRUE))
     
     ## Plot the central image, making space for labels, if required
@@ -843,11 +887,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        x$annotation$Col$fun(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
+        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col, control=x$annotation$Col$control, asIs=TRUE)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        x$annotation$Col$fun(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
+        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, grpcol=x$cluster$Row$col, control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
@@ -856,7 +900,7 @@ plot.annHeatmap = function(x, ...)
             par(mar=c(2, mmar[2]+2, 2, mmar[4]+2))
         } else {
             par(mar=c(mmar[1]+2, 2, mmar[3]+2, 2))            
-        }        
+        }       
         doLegend(x$data$breaks, col=x$data$col, x$layout$legend.side)
     }    
     

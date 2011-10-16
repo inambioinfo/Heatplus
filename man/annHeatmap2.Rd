@@ -53,7 +53,9 @@ a list that controls the row- and column labels, as well as their size and place
     Recognized entries for argument \code{annotation}: 
     \describe{
         \item{data}{a data frame containing the annotation data; defaults to \code{NULL}, i.e. no annotation is displayed}
-        \item{fun}{the plotting function for the annotation data; defaults to \code{picketPlot}, but any function that handles arguments \code{x},              \code{grp}, \code{grpcol} and \code{horizontal} in the same way would do.}
+        \item{control}{a list of fine-tuning parameters that is passed directly to \code{picketPlot}; defaults to an empty list, i.e. the default settings in \code{picketPlot}}
+        \item{asIs}{logical value indicating whether the annotation \code{data} needs to be pre-processed via \code{convAnnData} or not; defaults to \code{TRUE}}
+        \item{inclRef}{logical value indicating whether to include all levels of factor variables in \code{data}, or whether to drop the reference level (i.e. the first level). Defaults to \code{TRUE}}
     }
     
     Recognized entries for argument \code{cluster}:

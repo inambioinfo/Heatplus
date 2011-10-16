@@ -138,8 +138,8 @@ extractArg = function(arglist, deflist)
 ###################################################
 ### chunk number 5: picketPlot_Def
 ###################################################
-#line 195 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
-picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, control=list()) 
+#line 199 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs=FALSE, control=list()) 
 #
 # Name: picketPlot (looks like a picket fence with holes, and sounds like the
 #                   pocketplot in geostatistics)
@@ -164,25 +164,27 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
               degree=1, cex.label=1.5, numfac=2)
     cc[names(control)] = control
     
+    ## Convert/check the data
+    x = convAnnData(x, asIs=asIs)
+    
     # Count variables, panels, types
     nsamp  = nrow(x)
-    nvar   = ncol(x)
-    npanel = sapply(x, function(x) if (is.factor(x)) nlevels(x) else 1)
-    bpanel = sapply(x, is.factor)
+    npanel = ncol(x)
+    bpanel = apply(x, 2, function(y) all(y[is.finite(y)] %in% c(0,1)) )
     
     # Compute panel heights, widths
     panelw = nsamp*(cc$boxw+2*cc$hbuff)
     panelh = cc$boxh+2*cc$vbuff
-    totalh = sum(npanel * panelh * ifelse(bpanel, 1, cc$numfac))
+    totalh = sum(panelh * ifelse(bpanel, 1, cc$numfac))
     LL = cbind(0, 0)
     UR = cbind(panelw, totalh)
-    
+     
     # Set up the x-values for a single panel
     xbase = seq(cc$hbuff, by=cc$boxw+2*cc$hbuff, length=nsamp)
     xcent = xbase + cc$boxw/2
     
     # if we get a cluster variable, we have to set differently colored 
-    # backgrounds; this assumes that the grp variable is sorted in the 
+    # backgrounds; this assumes that the  grp variable is sorted in the 
     # way it appears on the plot
     if (!is.null(grp)) {
         grp = as.integer(factor(grp, levels=unique(grp)))
@@ -200,22 +202,20 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
     # Loop over vars and fill in the panels
     panels = list()
     voff = 0
-    for (i in 1:nvar) {
+    for (i in 1:npanel) {
         if (bpanel[i]) {
             ## Coordinates
-            x0 = rep(xbase, npanel[i])
+            x0 = xbase
             x1 = x0+cc$boxw
-            y0 = voff + rep(seq(cc$vbuff, by=cc$boxh+2*cc$vbuff, length=npanel[i]), rep(nsamp, npanel[i]))
-            y1 = y0 + cc$boxh
-            ## Convert factor to matrix & set fill
-            naAction = attr(na.exclude(x[,i, drop=FALSE]), "na.action")
-            bindata = naresid(naAction, model.matrix(~x[,i]-1))
-            fill = ifelse(bindata==1, "black", "transparent")
+            y0 = voff + cc$vbuff
+            y1 = y0   + cc$boxh
+            ## Set fill
+            fill = ifelse(x[, i, drop=FALSE]==1, "black", "transparent")
             fill[is.na(fill)] = cc$nacol
-            label = paste(colnames(x)[i], "=", levels(x[,i]))
-            labcc = if (!is.null(label)) sort(unique((y0+y1)/2)) else NULL 
+            label = colnames(x)[i]
+            labcc = if (!is.null(label)) (y0+y1)/2 else NULL 
             panels[[i]] = list(ll=cbind(x0, y0), ur=cbind(x1, y1), fill=fill, label=label, labcc=labcc)
-            voff = voff + panelh*npanel[i]
+            voff = voff + panelh
         } else {
             xv = x[,i]
             rr = range(xv, na.rm=TRUE)
@@ -266,7 +266,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
             grp0 = h2v(grp0)
             grp1 = h2v(grp1)
         }
-        for (i in 1:nvar) {
+        for (i in 1:npanel) {
             panels[[i]][[1]] = h2v(panels[[i]][[1]])
             panels[[i]][[2]] = h2v(panels[[i]][[2]])
             panels[[i]]$labcc = panels[[i]]$labcc - totalh 
@@ -281,7 +281,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         rect(grp0[,1], grp0[,2], grp1[,1], grp1[,2], col=grpcol, border="transparent")
     }
     # Loop over vars and fill in the panels
-    for (i in 1:nvar) {
+    for (i in 1:npanel) {
         if (bpanel[i]) {
             ## Do the rectangles
             with(panels[[i]], rect(ll[,1], ll[,2], ur[,1], ur[,2], col=fill, border="transparent") )
@@ -303,14 +303,14 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, cont
         axis(grpaxis, grpcoord, label=FALSE, tcl=-1.5)
         axis(grpaxis, mids, label=grplabel, font=2, cex.axis=cc$cex.label, tick=FALSE)
     }                                
-
+    invisible(panels)
 }
 
 
 ###################################################
 ### chunk number 6: findBreaks_Def
 ###################################################
-#line 375 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 379 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 niceBreaks = function(xr, breaks)
 {
     ## If you want it, you get it
@@ -342,7 +342,7 @@ niceBreaks = function(xr, breaks)
 ###################################################
 ### chunk number 7: breakColors_Def
 ###################################################
-#line 421 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 425 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 breakColors = function(breaks, colors, center=0, tol=0.001)
 {
     ## In case of explicit color definitions
@@ -384,7 +384,7 @@ breakColors = function(breaks, colors, center=0, tol=0.001)
 ###################################################
 ### chunk number 8: g2r.colors_Def
 ###################################################
-#line 462 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 466 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 g2r.colors = function(n=12, min.tinge = 0.33)
 {
     k <- trunc(n/2)
@@ -407,7 +407,7 @@ g2r.colors = function(n=12, min.tinge = 0.33)
 ###################################################
 ### chunk number 9: doLegend_Def
 ###################################################
-#line 493 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 497 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 doLegend = function(breaks, col, side)
 {
     zval = ( breaks[-1] + breaks[-length(breaks)] ) / 2
@@ -424,25 +424,56 @@ doLegend = function(breaks, col, side)
 ###################################################
 ### chunk number 10: convAnnData_Def
 ###################################################
-#line 514 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
-convAnnData = function(x, nval.fac=3)
+#line 520 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
 {
     if (is.null(x)) return(NULL)
+    if (asIs) {
+        if (is.matrix(x) & is.numeric(x)) return(x)
+        else stop("argument x not a numerical matrix, asIs=TRUE does not work")
+    }
+    
     x = as.data.frame(x)
     if (!is.null(nval.fac) & nval.fac>0) doConv = TRUE
     vv = colnames(x)
     for (v in vv) {
-        if (is.logical(x[,v])) x[,v] = factor(as.numeric(x[,v]))
-        if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) x[,v] = factor(x[,v])    
+        if (is.logical(x[,v])) {
+            x[,v] = factor(as.numeric(x[,v]))
+        }
+        if (doConv & length(unique(x[is.finite(x[,v]),v])) <= nval.fac) {
+            x[,v] = factor(x[,v])    
+        }
     }
-    x
+    ret  = NULL
+    ivar = 0
+    for (v in vv) {
+         if (is.factor(x[,v])) {
+            if (length(unique(x[,v])) > 1) {
+                naAction = attr(na.exclude(x[, v, drop=FALSE]), "na.action")
+                modMat   = model.matrix(~x[,v]-1)
+                if (!inclRef) modMat = modMat[ , -1, drop=FALSE]
+                binvar   = naresid(naAction, modMat)
+                colnames(binvar) = paste(v, "=", levels(x[,v])[if (!inclRef) -1 else TRUE], sep="")
+            } else {
+                ret = matrix(as.numeric(x[,v]), ncol=1)
+                colnames(ret) = paste(v, "=", levels(x[,v]), sep="")
+            }
+            ret = cbind(ret, binvar)
+            ivar = ivar + ncol(binvar)
+         } else {
+            ret = cbind(ret, x[,v])
+            ivar = ivar + 1
+            colnames(ret)[ivar] = v
+         }
+    }    
+    ret
 }
 
 
 ###################################################
 ### chunk number 11: cut.dendrogram_Def
 ###################################################
-#line 537 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 574 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 cutree.dendrogram = function(x, h)
 {
     # Cut the tree, get the labels
@@ -468,7 +499,7 @@ cutree.dendrogram = function(x, h)
 ###################################################
 ### chunk number 12: getLeaves_Def
 ###################################################
-#line 562 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 599 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 getLeaves = function(x)
 {
     unlist(dendrapply(x, function(x) attr(x, "label")))
@@ -478,7 +509,7 @@ getLeaves = function(x)
 ###################################################
 ### chunk number 13: print.annHeatmap_Def
 ###################################################
-#line 576 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 613 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 print.annHeatmap = function(x, ...)
 {
     cat("annotated Heatmap\n\n")
@@ -493,7 +524,7 @@ print.annHeatmap = function(x, ...)
 ###################################################
 ### chunk number 14: RainbowPastel_Def
 ###################################################
-#line 595 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 632 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 RainbowPastel =  function (n, blanche=200, ...)
 #
 # Name: RainbowPastel
@@ -514,7 +545,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 ###################################################
 ### chunk number 15: cutplot_dendrogam_Def
 ###################################################
-#line 615 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 652 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
 # Name: cutplot.dendrogram
@@ -580,7 +611,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 ###################################################
 ### chunk number 16: annHeatmap2_Def
 ###################################################
-#line 690 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 727 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=256, col=g2r.colors, legend=FALSE)
 #
 # Name: annHeatmap2
@@ -599,7 +630,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## See lattice:::xyplot.formula, modifyLists, lattice:::construct.scales
     def = list(clustfun=hclust, distfun=dist, status="yes", dendro=NULL)
     dendrogram = extractArg(dendrogram, def)
-    def = list(data=NULL, fun=picketPlot)
+    def = list(data=NULL, control=list(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
     def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
     cluster = extractArg(cluster, def)
@@ -681,8 +712,13 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
         })
 
     ## Process the annotation data frames (factor/numeric, re-sort?)
-    annotation$Row$data = convAnnData(annotation$Row$data)
-    annotation$Col$data = convAnnData(annotation$Col$data)
+    annotation$Row = within(annotation$Row, {
+        data = convAnnData(data, asIs=asIs, inclRef=inclRef)
+    })
+    annotation$Col = within(annotation$Col, {
+        data = convAnnData(data, asIs=asIs, inclRef=inclRef)
+    })
+
         
     ## Generate the new object
     
@@ -697,10 +733,12 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 ###################################################
 ### chunk number 17: plot.annHeatmap_Def
 ###################################################
-#line 810 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
-plot.annHeatmap = function(x, ...)
+#line 852 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+plot.annHeatmap = function(x, widths, heights, ...)
 {
     ## Set up the layout
+    if (!missing(widths)) x$layout$width = widths
+    if (!missing(heights)) x$layout$height = heights    
     with(x$layout, layout(plot, width, height, respect=TRUE))
     
     ## Plot the central image, making space for labels, if required
@@ -734,11 +772,11 @@ plot.annHeatmap = function(x, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        x$annotation$Col$fun(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col)
+        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col, control=x$annotation$Col$control, asIs=TRUE)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        x$annotation$Col$fun(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, horizontal=FALSE, grpcol=x$cluster$Row$col)
+        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, grpcol=x$cluster$Row$col, control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
@@ -747,7 +785,7 @@ plot.annHeatmap = function(x, ...)
             par(mar=c(2, mmar[2]+2, 2, mmar[4]+2))
         } else {
             par(mar=c(mmar[1]+2, 2, mmar[3]+2, 2))            
-        }        
+        }       
         doLegend(x$data$breaks, col=x$data$col, x$layout$legend.side)
     }    
     
@@ -759,7 +797,7 @@ plot.annHeatmap = function(x, ...)
 ###################################################
 ### chunk number 18: Generics_Def
 ###################################################
-#line 879 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 923 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
 
@@ -767,7 +805,7 @@ annHeatmap = function(x, ...) UseMethod("annHeatmap")
 ###################################################
 ### chunk number 19: regHeatmap_Def
 ###################################################
-#line 889 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 933 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=NULL, cluster=NULL,  labels=labels, legend=legend, ...)
@@ -778,7 +816,7 @@ regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, 
 ###################################################
 ### chunk number 20: annHeatmap_Def
 ###################################################
-#line 902 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 946 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
     ret = annHeatmap2(x, dendrogram=dendrogram, annotation=list(Col=list(data=annotation, fun=picketPlot)), cluster=cluster,  labels=labels, legend=TRUE, ...)
@@ -789,7 +827,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
 ###################################################
 ### chunk number 21: annHeatmapExpressionSet_Def
 ###################################################
-#line 914 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
+#line 958 "Heatplus/inst/doc/annHeatmapCommentedSource.Rnw"
 annHeatmap.ExpressionSet =function(x, ...)
 {
     expmat = exprs(x)

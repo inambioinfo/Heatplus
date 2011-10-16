@@ -186,7 +186,7 @@ annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTranslation)
 \begin{figure}
 \begin{center}
 <<annHeatmap4, fig=TRUE>>=
-ann4 = annHeatmap2(exprs(exdat2), ann=list(Row=list(data=pData(exdat2)), Col=list(data=annFeatures)))
+ann4 = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)))
 plot(ann4)
 @
 \end{center}
