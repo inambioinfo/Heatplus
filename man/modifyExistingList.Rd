@@ -1,12 +1,15 @@
 \name{modifyExistingList}
 \alias{modifyExistingList}
+\alias{extractArg}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Override existing list entries}
 \description{
-Override existing list entries
+Override existing list entries and extract arguments that are specified as named lists
 }
 \usage{
 modifyExistingList(x, val)
+
+extractArg(arglist, deflist)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,6 +18,12 @@ modifyExistingList(x, val)
 }
   \item{val}{
 %%     ~~Describe \code{val} here~~
+}
+  \item{arglist}{
+%%     ~~Describe \code{arglist} here~~
+}
+  \item{deflist}{
+%%     ~~Describe \code{deflist} here~~
 }
 }
 \details{
