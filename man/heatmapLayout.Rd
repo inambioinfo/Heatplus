@@ -13,7 +13,7 @@ heatmapLayout(dendrogram, annotation, leg.side = NULL, show = FALSE)
       A list with named entries \code{Row} and \code{Col}. Each of these is a list with a named entry \code{status}. If the value of \code{status} is the string \code{"yes"}, space will be set aside for drawing a row- and/or column dendrogram. 
 }
   \item{annotation}{
-      A list with named entries \code{Row} and \code{Col}. Each of these is a list with a named entry \code{data}. If the value of \code{status} is not \code{NULL}, space will be set aside for a picket plot showing the row- and/or column annotation.
+      A list with named entries \code{Row} and \code{Col}. Each of these is a list with a named entry \code{data}. If the value of \code{data} is not \code{NULL}, space will be set aside for a picket plot showing the row- and/or column annotation.
 }
   \item{leg.side}{
       An integer indicating on where to reserve space for the legend: values 1-4 correspond to below, to the left, above and to the right, as in e.g. \code{axis}. For a value of \code{NULL}, the function provides a reasonable default where there is space left in the layout. For any other value, no space for a legend is put aside. 

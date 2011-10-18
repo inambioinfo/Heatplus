@@ -1,10 +1,11 @@
 Package: Heatplus
 Version: 1.99.0
-Date: 2011-08-11
+Date: 2011-10-18
 Title: Heatmaps with row and/or column covariates and colored clusters  
 Author: Alexander Ploner <Alexander.Ploner@ki.se>
 Maintainer: Alexander Ploner <Alexander.Ploner@ki.se>
 Description: Display a rectangular heatmap (intensity plot) of a data matrix. By default, both samples (columns) and features (row) of the matrix are sorted according to a hierarchical clustering, and the corresponding dendrogram is plotted. Optionally, panels with additional information about samples and features can be added to the plot.  
 Imports: graphics, grDevices, stats
+Suggests: Biobase, hgu95av2.db, limma
 biocViews: Microarray, Visualization
 License: GPL (>= 2)
