@@ -69,7 +69,9 @@ heatmap_2 = function (x, Rowv, Colv, distfun = dist, hclustfun = hclust,
         sd <- apply(x, 2, sd, na.rm = na.rm)
         x <- sweep(x, 2, sd, "/")
     }
-    op <- par(no.readonly = TRUE)
+    ## Only margin played with here; using the comprehensive list from
+    ## no.readonly=FALSE crashed R CMD check
+    op <- par()["mar"]
     on.exit(par(op))
     # slightly dirty: trim of extremes to make the legend more reasonable
     if (!missing(trim)) {
@@ -250,8 +252,9 @@ heatmap_plus = function (x, addvar, covariate=NULL, picket.control=list(),
         sd <- apply(x, 2, sd, na.rm = na.rm)
         x <- sweep(x, 2, sd, "/")
     }
-    #op <- par(no.readonly = TRUE)
-    #on.exit(par(op))
+    ## Problems downstream with R CMD check re-setting of margins, pin
+    ##op <- par()["mar"]
+    ##on.exit(par(op))
     # slightly dirty: trim of extremes to make the legend more reasonable
     if (!missing(trim)) {
         trim = min(trim[1], 1-trim[1])
