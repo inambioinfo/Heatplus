@@ -1,80 +1,39 @@
 \name{niceBreaks}
 \alias{niceBreaks}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
-}
+\title{Get nice (symmetric) breaks for an interval}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Given a minimum and a maximum, this function returns a vector of equidistant breaks that covers this interval, and has a pretty interval length (1, 2, or 5 times a power of 10). If the interval contains zero, it will be one of the breaks, so that the intervals are arranged somewhat symmetrically around it.
 }
 \usage{
 niceBreaks(xr, breaks)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{xr}{
-%%     ~~Describe \code{xr} here~~
-}
-  \item{breaks}{
-%%     ~~Describe \code{breaks} here~~
-}
+    \item{xr}{the range to be covered, as \code{c(min, max)}}
+    \item{breaks}{either the desired number of breaks, or a pre-specified vector of breaks}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
+The number of desired breaks is honored as far as possible, which is not actually that often in practice. However, major deviations of three or more are reasonably rare.
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
+The functiona allows the specification of a set of breaks instead of the desired number of breaks, somewhat like in \code{cut}. However, if the length of \code{breaks} is greater than one, the function just returns \code{breaks}.
+}
+\value{A vector of pretty breaks covering the specified interval, more or less of the desired length. 
+}
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{pretty}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+    
+    ## Niceness overrules specified number
+    niceBreaks(c(-1,1), 5)
+    niceBreaks(c(-1,1), 6)
 
-## The function is currently defined as
-function (xr, breaks) 
-{
-    if (length(breaks) > 1) {
-        return(breaks)
-    }
-    if ((xr[1] < 0) & (xr[2] > 0)) {
-        xminAbs = abs(xr[1])
-        xmax = xr[2]
-        nneg = max(round(breaks * xminAbs/(xmax + xminAbs)), 
-            1)
-        npos = max(round(breaks * xmax/(xmax + xminAbs)), 1)
-        nbr = pretty(c(xr[1], 0), nneg)
-        pbr = pretty(c(0, xr[2]), npos)
-        diff = ((nbr[2] - nbr[1]) + (pbr[2] - pbr[1]))/2
-        nbr = diff * ((xr[1]\%/\%diff):0)
-        pbr = diff * (1:(xr[2]\%/\%diff + 1))
-        breaks = c(nbr, pbr)
-    }
-    else {
-        breaks = pretty(xr, breaks)
-    }
-    breaks
-  }
+    ## Zero appears always as break
+    niceBreaks(c(-2.75, 1.12), 8)
+
+    ## Not invariant to translation (of course)
+    niceBreaks(3.27 + c(-2.75, 1.12), 8)
+
+    
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
+

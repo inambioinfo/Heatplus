@@ -6,7 +6,7 @@
 Default method for regular heatmaps
 }
 \usage{
-regHeatmap.default(x, dendrogram = list(clustfun = hclust, distfun = dist, status = "yes"), labels = NULL, legend = TRUE, ...)
+    \method{regHeatmap}{default}(x, dendrogram = list(clustfun = hclust, distfun = dist, status = "yes"), labels = NULL, legend = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,18 +36,6 @@ regHeatmap.default(x, dendrogram = list(clustfun = hclust, distfun = dist, statu
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }

@@ -1,73 +1,41 @@
 \name{g2r.colors}
 \alias{g2r.colors}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{Palette from green to red via black
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Returns a color vector of the requested length, ranging from pure red to pure green via slighlty tinted black.
 }
 \usage{
 g2r.colors(n = 12, min.tinge = 0.33)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{n}{
-%%     ~~Describe \code{n} here~~
-}
-  \item{min.tinge}{
-%%     ~~Describe \code{min.tinge} here~~
-}
+    \item{n}{the number of requested colors}
+    \item{min.tinge}{the proportion of red/green added to black to make it recognizably green or red}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+    If \code{n} is even, the colors range from pure green to green-tinted black to red-tinted black to pure red. If \code{n} is odd, the colors range from pure red to pure green, with full black for the median class.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    A vector of (RGB-) colors of the specified length
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{breakColors}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+    ## Even number: residual tint shows left/right of center
+    co_even = g2r.colors(10)
+    co_even
+    doLegend(1:11, co_even, 1)
+    
+    ## Odd number: central class all black
+    co_odd = g2r.colors(9)
+    co_odd
+    doLegend(1:10, co_odd, 1)
 
-## The function is currently defined as
-function (n = 12, min.tinge = 0.33) 
-{
-    k <- trunc(n/2)
-    if (2 * k == n) {
-        g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, k))
-        r <- c(rep(0, k), seq(min.tinge, 1, length = k))
-        colvec <- rgb(r, g, rep(0, 2 * k))
-    }
-    else {
-        g <- c(rev(seq(min.tinge, 1, length = k)), rep(0, k + 
-            1))
-        r <- c(rep(0, k + 1), seq(min.tinge, 1, length = k))
-        colvec <- rgb(r, g, rep(0, 2 * k + 1))
-    }
-    colvec
-  }
+    ## Lighter tint in the middle
+    co_light = g2r.colors(10, min.tinge=0.50)
+    co_light
+    doLegend(1:11, co_light, 1)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
+
