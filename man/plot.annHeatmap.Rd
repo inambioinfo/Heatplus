@@ -6,7 +6,7 @@
 Plotting method for annotated heatmaps
 }
 \usage{
-plot.annHeatmap(x, widths, heights, ...)
+    \method{plot}{annHeatmap}(x, widths, heights, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
