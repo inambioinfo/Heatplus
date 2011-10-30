@@ -1,6 +1,5 @@
 \name{Undocumented functions}
-\alias{ExtractVar}
-\alias{binary_factor}
+\alias{getLeaves}
 \title{Undocumented functions}
 \description{
 These functions are currently undocumented. Please refer to the source and source comments if you feel you need to use them.
