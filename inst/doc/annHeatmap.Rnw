@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Examples of annotated and regular heatmaps}
+%\VignetteIndexEntry{Annotated and regular heatmaps}
 %\VignetteDepends{}
 %\VignetteKeywords{microarray, visualization}
 %\VignettePackage{Heatplus}
@@ -42,7 +42,7 @@ The package \Rpackage{Heatplus} offers several functions for producing heatmaps,
 
 %% Reduce output line width
 <<echo=FALSE, results=hide>>=
-options(width=75)
+options(width=65)
 @
 
 {{{\section{Setup}
@@ -74,7 +74,7 @@ exdat2 = exdat[geneID,]
 
 The function \Rfunction{regHeatmap} generates heatmaps without annotation. Apart from some display defaults, this is very similar to standard \Rfunction{heatmap}, but allows you to add a simple legend.
 
-Figure~\ref{fig1} shows the full example data with the default settings. Figure~\ref{fig2} shows the gene expression for the short list, with the legend move to the right, for simpler breaks of the intensity scale and a different palette. Figure~\ref{fig3} shows how different distance- and clustering functions can be passed in. Figure~\ref{fig4} shows how the lists of arguments can be used to specify different settings for row- and column dendrograms.
+Figure \ref{fig1} shows the full example data with the default settings. Figure \ref{fig2} shows the gene expression for the short list, with the legend moved to the right, for simpler breaks of the intensity scale and a different palette. Figure \ref{fig3} shows how different distance- and clustering functions can be passed in. Figure \ref{fig4} shows how the lists of arguments can be used to specify different settings for row- and column dendrograms.
 
 {{{ %% Fig1: regular, defaults, full data
 \begin{figure}
@@ -107,7 +107,8 @@ plot(reg2)
 <<regHeatmap3, fig=TRUE>>=
 corrdist = function(x) as.dist(1-cor(t(x)))
 hclust.avl = function(x) hclust(x, method="average")
-reg3 = regHeatmap(exprs(exdat2), legend=2, dendrogram=list(clustfun=hclust.avl, distfun=corrdist))
+reg3 = regHeatmap(exprs(exdat2), legend=2, dendrogram =
+list(clustfun=hclust.avl, distfun=corrdist))
 plot(reg3)
 @
 \end{center}
@@ -119,11 +120,12 @@ plot(reg3)
 \begin{figure}
 \begin{center}
 <<regHeatmap4, fig=TRUE>>=
-reg4 = regHeatmap(exprs(exdat2), legend=3, dendrogram=list(Col=list(status="hide")))
+reg4 = regHeatmap(exprs(exdat2), legend=3,
+dendrogram=list(Col=list(status="hide")))
 plot(reg4)
 @
 \end{center}
-\caption{Heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. The column dendrogram is not shown, though the samples are still arranged as in Figure~\ref{fig2}.\label{fig4}}
+\caption{Heatmap with row- and column dendrograms and a legend for 46 genes and 26 samples. The column dendrogram is not shown, though the samples are still arranged as in Figure \ref{fig2}.\label{fig4}}
 \end{figure}
 }}}
 
@@ -131,6 +133,8 @@ plot(reg4)
 }}}
 
 {{{\section{Annotated heatmaps}
+
+Figure \ref{fig5} shows the default annotated heatmap for the full data set. Figure \ref{fig6} shows the default annotated heatmap for the smaller data set, with the column dendrogram cut at distance 5000.
 
 {{{ %% Fig5: annotated, defaults, full data
 \begin{figure}
@@ -182,25 +186,60 @@ Let's put this into an annotation data frame:
 annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTranslation)
 @
 
+Figure \ref{fig7} shows the smaller data set with default settings. Figure \ref{fig8} changes the space alloted for the feature- and sample labels. Figure \ref{fig9} additionally slims the annotation data frames by excluding the reference levels for the factor variables; it also shows how the plot method allows changing the proportions of the heatmap in display. Figure \ref{fig10} shows how to construct an annotation data frame beforehand using \Rfunction{convAnnData} and passing it in unchanged using the \Rfunarg{asIs} switch in the \Rfunarg{annotation} argument.
+
 {{{ %% Fig7: double annotated, default, subsets
 \begin{figure}
 \begin{center}
 <<annHeatmap4, fig=TRUE>>=
 ann4 = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)))
 plot(ann4)
-ann4a = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
-ann4b = annHeatmap2(exprs(exdat2), ann=list(inclRef=FALSE, Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
-#plot(ann4b, widths=c(2,5,1), heights=c(2,5,1))
-ann1 = convAnnData(pData(exdat2), inclRef=FALSE)[, 3:1]
-colnames(ann1) = c("Score", "isControl", "isMale")
-ann2 = convAnnData(annFeatures, inclRef=FALSE)[, 3:1]
-colnames(ann2) = c("isTranslation", "isCorrelated", "SE")
-ann4c = annHeatmap2(exprs(exdat2), ann=list(asIs=TRUE, Col=list(data=ann1), Row=list(data=ann2)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
 @
 \end{center}
 \caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples.\label{fig7}}
 \end{figure}
 }}} 
+
+{{{ %% Fig8: double annotated, subsets, more space for labels
+\begin{figure}
+\begin{center}
+<<annHeatmap5, fig=TRUE>>=
+ann4a = annHeatmap2(exprs(exdat2), ann=list(Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
+plot(ann4a)
+@
+\end{center}
+\caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples, with modified space for column/row labels.\label{fig8}}
+\end{figure}
+}}} 
+
+{{{ %% Fig9: double annotated, subsets, no reference labels, changed plot prop
+\begin{figure}
+\begin{center}
+<<annHeatmap6, fig=TRUE>>=
+ann4b = annHeatmap2(exprs(exdat2), ann=list(inclRef=FALSE, Col=list(data=pData(exdat2)), Row=list(data=annFeatures)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
+plot(ann4b, widths=c(2,5,1), heights=c(2,5,1))
+@
+\end{center}
+\caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples. Extra space for labels, no reference levels for annotation data, and changed proportions of the plot.\label{fig9}}
+\end{figure}
+}}} 
+
+{{{ %% Fig10: double annotated, default, subsets
+\begin{figure}
+\begin{center}
+<<annHeatmap7, fig=TRUE>>=
+ann1 = convAnnData(pData(exdat2), inclRef=FALSE)[, 3:1]
+colnames(ann1) = c("Score", "isControl", "isMale")
+ann2 = convAnnData(annFeatures, inclRef=FALSE)[, 3:1]
+colnames(ann2) = c("isTranslation", "isCorrelated", "SE")
+ann4c = annHeatmap2(exprs(exdat2), ann=list(asIs=TRUE, Col=list(data=ann1), Row=list(data=ann2)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
+plot(ann4c)
+@
+\end{center}
+\caption{Double annotated heatmap with row- and column dendrograms and annotation, plus a legend, for 46 genes and 26 samples, with refined annotation data frames passed in and used unchanged.\label{fig10}}
+\end{figure}
+}}} 
+
 
 
 
@@ -210,13 +249,13 @@ ann4c = annHeatmap2(exprs(exdat2), ann=list(asIs=TRUE, Col=list(data=ann1), Row=
 
 The following improvements are planned for the next release:
 \begin{itemize}
-\item Better control over appearance of annotation panels: 
-\begin{itemize}
-\item Pass-through option for annotation data frame
-\item Optional inclusion/exclusion of reference levels for factor variables in the annotation data frames
-\item User-defined variable labels
-\end{itemize}
-\item Possiblity to switch off and/or pass through feature- and sample names for the central heatmap
+%%\item Better control over appearance of annotation panels: 
+%%\begin{itemize}
+%% \item Pass-through option for annotation data frame 
+%%\item Optional inclusion/exclusion of reference levels for factor variables in the annotation data frames
+%%\item User-defined variable labels
+%%\end{itemize}
+%%\item Possiblity to switch off and/or pass through feature- and sample names for the central heatmap
 \item Improved precision for coloring the cutting height in dendrograms
 \item Specification of common clustering algorithms and distance measures via character codes (instead of costum wrapper functions for \Rfunction{hclust} and \Rfunction{dist}) 
 \end{itemize}

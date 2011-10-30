@@ -1,6 +1,6 @@
 \documentclass[10pt]{article}
 
-%\VignetteIndexEntry{Old Heatplus functions (deprecate)}
+%\VignetteIndexEntry{Old functions (deprecated)}
 %\VignetteDepends{}
 %\VignetteKeywords{microarray, visualization}
 %\VignettePackage{Heatplus}

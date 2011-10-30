@@ -3,6 +3,8 @@
 \title{Display an Annotated Heatmap}
 \description{
 This function displays an expression data matrix as a heatmap with a column dendrogram. A given clustering will be shown in color.  Additionally, a number of binary and interval scaled covariates can be added to characterize these clusters.
+
+This function is just about to be deprecated. Please use functions \code{annHeatmap} or \code{annHeatmap2} for new projects.
 }
 \usage{
 heatmap_plus(x, addvar, covariate = NULL, picket.control = list(), h, clus,
@@ -52,7 +54,7 @@ A list with components
 Alexander Ploner for the modifications documented here.
 }
 \seealso{\code{\link{heatmap_2}}, \code{\link{heatmap}}, \code{\link{oldPicketplot}}, \code{\link{oldCutplot.dendrogram}},
-         \code{\link{RGBColVec}}}
+\code{\link{RGBColVec}}, \code{\link{annHeatmap}}, \code{\link{annHeatmap2}} }
 \examples{
 # create data
 mm = matrix(rnorm(1000, m=1), 100,10)

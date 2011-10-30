@@ -1,52 +1,36 @@
 \name{print.annHeatmap}
 \alias{print.annHeatmap}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Printing method for annotated heatmaos}
+\title{Printing information about annotated heatmaps}
 \description{
-Printing method for annotated heatmaos
+Printing method for annotated heatmaps
 }
 \usage{
     \method{print}{annHeatmap}(x, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+    \item{x}{an object of class \code{annHeatmap}
 }
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+    \item{\dots}{extra arguments, currently ignored
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+A very simple printing method, displaying a minimum of information about dendrograms and annotation
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    \code{x} is returned invisibly
 }
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{annHeatmap}}, \code{\link{annHeatmap2}}, \code{\link{plot.annHeatmap}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(x, ...)
-{
-    cat("annotated Heatmap\n\n")
-    cat("Rows: "); show(x$dendrogram$Row$dendro)
-    cat("\t", if (is.null(x$annotation$Row$data)) 0 else ncol(x$annotation$Row$data), " annotation variable(s)\n")
-    cat("Cols: "); show(x$dendrogram$Col$dendro)
-    cat("\t", if (is.null(x$annotation$Col$data)) 0 else ncol(x$annotation$Col$data), " annotation variable(s)\n")
-    invisible(x)
-  }
+    set.seed(219)
+    mat = matrix(rnorm(100), ncol=5)
+    ann = data.frame(Class=c("A","A","B","A","B"))
+    map1 = annHeatmap(mat, ann)
+    map1
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{hplot}
+

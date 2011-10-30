@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Commented source for annotated and regular heatmaps}
+%\VignetteIndexEntry{Commented package source}
 %\VignetteDepends{}
 %\VignetteKeywords{microarray, visualization}
 %\VignettePackage{Heatplus}

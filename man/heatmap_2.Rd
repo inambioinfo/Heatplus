@@ -6,6 +6,8 @@ This function displays an expression data matrix as a heatmap. It is based on
 an old version of \code{heatmap} in the \code{stats} package, but offers more
 flexibility (e.g. skipping dendrograms, skipping row/column labelling, adding a
 legend).
+
+This function is just about to be deprecated. Please use \code{regHeatmap} for new projects.
 }
 \usage{
 heatmap_2(x, Rowv, Colv, distfun = dist, hclustfun = hclust, add.expr, 
@@ -45,7 +47,7 @@ Same as \code{heatmap} with \code{keep.dendro=FALSE}: an invisible list giving t
 
 Alexander Ploner for this version.
 }
-\seealso{\code{\link{heatmap}}, \code{\link{hclust}}, \code{\link{heatmap_plus}}}
+\seealso{\code{\link{heatmap}}, \code{\link{hclust}}, \code{\link{heatmap_plus}}, \code{\link{regHeatmap}}, \code{\link{annHeatmap}}}
 \examples{
 # create data
 mm = matrix(rnorm(1000, m=1), 100,10)
