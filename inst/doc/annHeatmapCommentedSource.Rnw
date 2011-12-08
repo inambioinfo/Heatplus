@@ -887,11 +887,11 @@ plot.annHeatmap = function(x, widths, heights, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd,], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col, control=x$annotation$Col$control, asIs=TRUE)
+        picketPlot(x$annotation$Col$data[x$data$colInd, ,drop=FALSE], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col, control=x$annotation$Col$control, asIs=TRUE)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd,], grp=x$cluster$Row$grp, grpcol=x$cluster$Row$col, control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
+        picketPlot(x$annotation$Row$data[x$data$rowInd, ,drop=FALSE], grp=x$cluster$Row$grp, grpcol=x$cluster$Row$col, control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
@@ -908,6 +908,8 @@ plot.annHeatmap = function(x, widths, heights, ...)
     
 }
 @
+
+FIXME: This terminates currently ungracefully if the dimension of the annotation frame does not match the dimension of the data; some kind of check is required, either in the generating function or here where we try to plot.
 
 }}}
 
@@ -949,6 +951,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
     ret
 }
 @
+FIXME: The glaring disdavantage is that while this makes specification of the annotation slightly simpler, it does not allow to specify e.g.  \Rfunarg{inclRef}.
 
 }}}
 
