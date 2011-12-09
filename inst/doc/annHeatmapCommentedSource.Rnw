@@ -777,7 +777,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     }
     
     ## Construct the breaks and colors for display
-    breaks = niceBreaks(range(x2), breaks)
+    breaks = niceBreaks(range(x2, na.rm=TRUE), breaks)
     col    = breakColors(breaks, col)
     
     ## Generate the dendrograms, if required; re-indexes in any cases

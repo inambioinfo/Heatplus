@@ -175,15 +175,15 @@ df = nrow(exdat2)-2
 TT = sqrt(df) * CO/sqrt(1-CO^2)
 PV = 2*pt(-abs(TT), df=df)
 @
-Finally, we want to see which of the features are associated with the GeneOntology category \textit{translation}:
+Finally, we want to see which of the features are associated with the GeneOntology category \textit{translational elongation}:
 <<setupX3>>=
 require(hgu95av2.db)
 allGO = as.list(mget(featureNames(exdat2), hgu95av2GO))
-isTranslation = sapply(allGO, function(x) "GO:0006412" %in% names(x))
+isTransElong = sapply(allGO, function(x) "GO:0006414" %in% names(x))
 @
 Let's put this into an annotation data frame:
 <<setupX4>>=
-annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTranslation)
+annFeatures = data.frame(standard.errors=SE, sigCorScore=PV<0.05, isTransElong)
 @
 
 Figure \ref{fig7} shows the smaller data set with default settings. Figure \ref{fig8} changes the space alloted for the feature- and sample labels. Figure \ref{fig9} additionally slims the annotation data frames by excluding the reference levels for the factor variables; it also shows how the plot method allows changing the proportions of the heatmap in display. Figure \ref{fig10} shows how to construct an annotation data frame beforehand using \Rfunction{convAnnData} and passing it in unchanged using the \Rfunarg{asIs} switch in the \Rfunarg{annotation} argument.
@@ -231,7 +231,7 @@ plot(ann4b, widths=c(2,5,1), heights=c(2,5,1))
 ann1 = convAnnData(pData(exdat2), inclRef=FALSE)[, 3:1]
 colnames(ann1) = c("Score", "isControl", "isMale")
 ann2 = convAnnData(annFeatures, inclRef=FALSE)[, 3:1]
-colnames(ann2) = c("isTranslation", "isCorrelated", "SE")
+colnames(ann2) = c("isTranslationalElongation", "isCorrelated", "SE")
 ann4c = annHeatmap2(exprs(exdat2), ann=list(asIs=TRUE, Col=list(data=ann1), Row=list(data=ann2)), labels=list(Row=list(nrow=7), Col=list(nrow=2)))
 plot(ann4c)
 @
