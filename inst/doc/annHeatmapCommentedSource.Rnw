@@ -539,16 +539,26 @@ convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
     ret  = NULL
     ivar = 0
     for (v in vv) {
-         if (is.factor(x[,v])) {
-            if (length(unique(x[,v])) > 1) {
+         xx = x[, v]
+         if (is.factor(xx)) {
+            nandx = is.na(xx)
+            if (length(unique(x[!nandx])) > 1) {
                 naAction = attr(na.exclude(x[, v, drop=FALSE]), "na.action")
-                modMat   = model.matrix(~x[,v]-1)
+                modMat   = model.matrix(~xx-1)
                 if (!inclRef) modMat = modMat[ , -1, drop=FALSE]
                 binvar   = naresid(naAction, modMat)
-                colnames(binvar) = paste(v, "=", levels(x[,v])[if (!inclRef) -1 else TRUE], sep="")
+                colnames(binvar) = paste(v, "=", levels(xx)[if (!inclRef) -1 else TRUE], sep="")
             } else {
-                ret = matrix(as.numeric(x[,v]), ncol=1)
-                colnames(ret) = paste(v, "=", levels(x[,v]), sep="")
+                nlev = length(levels(xx))
+                ilev = unique(as.numeric(xx[!nandx]))
+                if (length(ilev)==0) {
+                    binvar = matrix(NA, nrow=length(xx), ncol=nlev)
+                } else {
+                    binvar = matrix(0, nrow=length(xx), ncol=nlev)
+                    binvar[, ilev] = 1
+                    binvar[nandx, ] = NA
+                }
+                colnames(binvar) = paste(v, "=", levels(xx), sep="")
             }
             ret = cbind(ret, binvar)
             ivar = ivar + ncol(binvar)
@@ -557,7 +567,7 @@ convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
             ivar = ivar + 1
             colnames(ret)[ivar] = v
          }
-    }    
+    } 
     ret
 }
 @           
