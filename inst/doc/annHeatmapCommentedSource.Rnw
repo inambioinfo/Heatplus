@@ -542,7 +542,7 @@ convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
          xx = x[, v]
          if (is.factor(xx)) {
             nandx = is.na(xx)
-            if (length(unique(x[!nandx])) > 1) {
+            if (length(unique(xx[!nandx])) > 1) {
                 naAction = attr(na.exclude(x[, v, drop=FALSE]), "na.action")
                 modMat   = model.matrix(~xx-1)
                 if (!inclRef) modMat = modMat[ , -1, drop=FALSE]
