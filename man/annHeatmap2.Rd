@@ -47,6 +47,7 @@ a list that controls the row- and column labels, as well as their size and place
         \item{clustfun}{the clustering function for generating the dendrogram; defaults to \code{hclust} for rows and columns}
         \item{distfun}{a function that returns the pairwise distances between samples/features as an object of class \code{dist}; defaults to \code{dist} for rows and columns}
         \item{status}{a string that controls the display of the dendrogram: \code{yes} means use the dendrogram to re-order the rows/columns and display the dendrogram; \code{hidden} means re-rorder, but do not display; \code{no} means do not use the dendrogram at all.}
+        \item{lwd}{the line width of the branches of the dendrogram; defaults to 3.}
         \item{dendro}{an override argument that allows to pass in a dendrogram directly, bypassing the \code{clustfun} and \code{distfun} mechanism; defaults to \code{NULL} (i.e. is not used)}
     }
     

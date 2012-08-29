@@ -624,7 +624,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     
     ## Process the different lists: dendrogram, cluster, annotation
     ## See lattice:::xyplot.formula, modifyLists, lattice:::construct.scales
-    def = list(clustfun=hclust, distfun=dist, status="yes", dendro=NULL)
+    def = list(clustfun=hclust, distfun=dist, status="yes", lwd=3, dendro=NULL)
     dendrogram = extractArg(dendrogram, def)
     def = list(data=NULL, control=list(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
@@ -756,12 +756,12 @@ plot.annHeatmap = function(x, widths, heights, ...)
     with(x$dendrogram$Col,
         if (status=="yes") {
             par(mar=c(0, mmar[2], 3, mmar[4]))
-            cutplot.dendrogram(dendro, h=x$cluster$Col$cuth, cluscol=x$cluster$Col$col, horiz=FALSE, axes = FALSE, xaxs = "i", leaflab = "none")
+            cutplot.dendrogram(dendro, h=x$cluster$Col$cuth, cluscol=x$cluster$Col$col, horiz=FALSE, axes = FALSE, xaxs = "i", leaflab = "none", lwd=x$dendrogram$Col$lwd)
         })
     with(x$dendrogram$Row,
         if (status=="yes") {
             par(mar=c(mmar[1], 3, mmar[3], 0))
-            cutplot.dendrogram(dendro, h=x$cluster$Row$cuth, cluscol=x$cluster$Row$col, horiz=TRUE, axes = FALSE, yaxs = "i", leaflab = "none")
+            cutplot.dendrogram(dendro, h=x$cluster$Row$cuth, cluscol=x$cluster$Row$col, horiz=TRUE, axes = FALSE, yaxs = "i", leaflab = "none", lwd=x$dendrogram$Row$lwd)
         })
 
     ## Plot the column/row annotation data, as required
