@@ -21,11 +21,14 @@ picketPlot(x, grp = NULL, grpcol, grplabel = NULL, horizontal = TRUE, asIs = FAL
           \item{\code{boxh} is the relative length of the long side of a box marking (default: 4)}
           \item{\code{hbuff} is the relative distance between two box markings for the same variable (horizontal buffer for a horizontal plot). Default is 0.1}
           \item{\code{vbuff} is the relative distance between two box markings for the same subject, but different variables (default: 0.1)}
-          \item{\code{span} is the span argument for the loess smoother. Default is 1/3; setting this to zero switches off smoothing.}
-          \item{\code{degree} is the degree of loess smoothing. Default is 1; setting this to zero switches off smoothing}
           \item{\code{cex.label} is the expansion factor for plotting cluster labels}
           \item{\code{numfac} is the expansion factor indicating how much higher (for a horizontal plot) or wider (for a vertical plot) panels with numerical variables are than panels for factor variables.}
           \item{\code{nacol} is the color for box markings indicating missing values (default: \code{gray(0.85)})}
+          \item{\code{span} is the span argument for the loess smoother. Default is 1/3; setting this to zero switches off smoothing.}
+          \item{\code{degree} is the degree of loess smoothing. Default is 1; setting this to zero switches off smoothing}
+          \item{\code{pch} is the plotting character for numerical variables}
+          \item{\code{cex.pch} is the size of the plotting character for numerical variables}
+          \item{\code{col.pch} is the color of the plotting character for numerical variables}          
       }
   }
 }

@@ -218,7 +218,8 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
 {    
     # deal with the setup
     cc = list(boxw=1, boxh=4, hbuff=0.1, vbuff=0.1, span=1/3, nacol=gray(0.85), 
-              degree=1, cex.label=1.5, numfac=2)
+              degree=1, cex.label=1.5, numfac=2, pch=par("pch"),
+              cex.pch=par("cex"), col.pch=par("col") )
     cc[names(control)] = control
     
     ## Convert/check the data
@@ -345,7 +346,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
             ## Do the rectangles
             with(panels[[i]], rect(ll[,1], ll[,2], ur[,1], ur[,2], col=fill, border="transparent") )
         } else {
-            with(panels[[i]], points(raw[,1], raw[,2]))
+            with(panels[[i]], points(raw[,1], raw[,2], pch=cc$pch, cex=cc$cex.pch, col=cc$col.pch))
             if ((cc$degree>0) & (cc$span>0)){
                 with(panels[[i]], lines(smo[,1], smo[,2]))
             }
