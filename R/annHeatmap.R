@@ -1,4 +1,4 @@
-### R code from vignette source 'inst/doc/annHeatmapCommentedSource.Rnw'
+### R code from vignette source 'annHeatmapCommentedSource.Rnw'
 
 ###################################################
 ### code chunk number 1: annHeatmapCommentedSource.Rnw:44-45
@@ -219,6 +219,8 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
             yval = voff + cc$vbuff*cc$numfac + ((xv - rr[1])/(rr[2] - rr[1]))*cc$boxh*cc$numfac
             if ((cc$degree>0) & (cc$span>0)){
                 yy = predict(loess(yval~xcent, span=cc$span, degree=cc$degree))
+            } else {
+                yy = rep(NA, length(xcent))
             }
             label = colnames(x)[i]
             labcc = if (!is.null(label)) mean(range(yval, na.rm=TRUE)) else NULL
