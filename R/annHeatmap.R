@@ -734,7 +734,14 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 ###################################################
 plot.annHeatmap = function(x, widths, heights, ...)
 {
-    ## Set up the layout
+    ## If there are cluster labels on either axis, we reserve space for them
+    doRClusLab = !is.null(x$cluster$Row$label) 
+    doCClusLab = !is.null(x$cluster$Col$label)
+    omar = rep(0, 4)
+    if (doRClusLab) omar[1] = 2
+    if (doCClusLab) omar[4] = 2
+    par(oma=omar)
+    ## Set up the layout    
     if (!missing(widths)) x$layout$width = widths
     if (!missing(heights)) x$layout$height = heights    
     with(x$layout, layout(plot, width, height, respect=TRUE))
@@ -770,11 +777,15 @@ plot.annHeatmap = function(x, widths, heights, ...)
     ## Plot the column/row annotation data, as required
     if (!is.null(x$annotation$Col$data)) {
         par(mar=c(1, mmar[2], 0, mmar[4]), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Col$data[x$data$colInd, ,drop=FALSE], grp=x$cluster$Col$grp, grpcol=x$cluster$Col$col, control=x$annotation$Col$control, asIs=TRUE)
+        picketPlot(x$annotation$Col$data[x$data$colInd, ,drop=FALSE],
+          grp=x$cluster$Col$grp, grplabel=x$cluster$Col$label, grpcol=x$cluster$Col$col,
+          control=x$annotation$Col$control, asIs=TRUE)
     }
     if (!is.null(x$annotation$Row$data)) {
         par(mar=c(mmar[1], 0, mmar[3], 1), xaxs="i", yaxs="i")
-        picketPlot(x$annotation$Row$data[x$data$rowInd, ,drop=FALSE], grp=x$cluster$Row$grp, grpcol=x$cluster$Row$col, control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
+        picketPlot(x$annotation$Row$data[x$data$rowInd, ,drop=FALSE],
+          grp=x$cluster$Row$grp, grplabel=x$cluster$Row$label, grpcol=x$cluster$Row$col,
+          control=x$annotation$Row$control, asIs=TRUE, horizontal=FALSE)
     }
 
     ## Plot a legend, as required
