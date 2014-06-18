@@ -1,4 +1,4 @@
-### R code from vignette source 'annHeatmapCommentedSource.Rnw'
+### R code from vignette source 'vignettes/annHeatmapCommentedSource.Rnw'
 
 ###################################################
 ### code chunk number 1: annHeatmapCommentedSource.Rnw:44-45
@@ -157,9 +157,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
 #       - re-arranged code for vertical/horizontal drawing
 {    
     # deal with the setup
-    cc = list(boxw=1, boxh=4, hbuff=0.1, vbuff=0.1, span=1/3, nacol=gray(0.85), 
-              degree=1, cex.label=1.5, numfac=2, pch=par("pch"),
-              cex.pch=par("cex"), col.pch=par("col") )
+    cc = picketPlotControl()
     cc[names(control)] = control
     
     ## Convert/check the data
@@ -308,7 +306,18 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
 
 
 ###################################################
-### code chunk number 6: findBreaks_Def
+### code chunk number 6: picketPlotControl_Def
+###################################################
+picketPlotControl = function()
+{
+    list(boxw=1, boxh=4, hbuff=0.1, vbuff=0.1, span=1/3, nacol=gray(0.85), 
+         degree=1, cex.label=1.5, numfac=2, pch=par("pch"), cex.pch=par("cex"),
+         col.pch=par("col") )
+}
+
+
+###################################################
+### code chunk number 7: findBreaks_Def
 ###################################################
 niceBreaks = function(xr, breaks)
 {
@@ -339,7 +348,7 @@ niceBreaks = function(xr, breaks)
 
 
 ###################################################
-### code chunk number 7: breakColors_Def
+### code chunk number 8: breakColors_Def
 ###################################################
 breakColors = function(breaks, colors, center=0, tol=0.001)
 {
@@ -380,7 +389,7 @@ breakColors = function(breaks, colors, center=0, tol=0.001)
 
 
 ###################################################
-### code chunk number 8: g2r.colors_Def
+### code chunk number 9: g2r.colors_Def
 ###################################################
 g2r.colors = function(n=12, min.tinge = 0.33)
 {
@@ -402,7 +411,7 @@ g2r.colors = function(n=12, min.tinge = 0.33)
 
 
 ###################################################
-### code chunk number 9: doLegend_Def
+### code chunk number 10: doLegend_Def
 ###################################################
 doLegend = function(breaks, col, side)
 {
@@ -418,7 +427,7 @@ doLegend = function(breaks, col, side)
 
 
 ###################################################
-### code chunk number 10: convAnnData_Def
+### code chunk number 11: convAnnData_Def
 ###################################################
 convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
 {
@@ -476,7 +485,7 @@ convAnnData = function(x, nval.fac=3, inclRef=TRUE, asIs=FALSE)
 
 
 ###################################################
-### code chunk number 11: cut.dendrogram_Def
+### code chunk number 12: cut.dendrogram_Def
 ###################################################
 cutree.dendrogram = function(x, h)
 {
@@ -501,7 +510,7 @@ cutree.dendrogram = function(x, h)
 
 
 ###################################################
-### code chunk number 12: getLeaves_Def
+### code chunk number 13: getLeaves_Def
 ###################################################
 getLeaves = function(x)
 {
@@ -510,7 +519,7 @@ getLeaves = function(x)
 
 
 ###################################################
-### code chunk number 13: print.annHeatmap_Def
+### code chunk number 14: print.annHeatmap_Def
 ###################################################
 print.annHeatmap = function(x, ...)
 {
@@ -524,7 +533,7 @@ print.annHeatmap = function(x, ...)
 
 
 ###################################################
-### code chunk number 14: RainbowPastel_Def
+### code chunk number 15: RainbowPastel_Def
 ###################################################
 RainbowPastel =  function (n, blanche=200, ...)
 #
@@ -544,7 +553,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 
 
 ###################################################
-### code chunk number 15: cutplot_dendrogam_Def
+### code chunk number 16: cutplot_dendrogam_Def
 ###################################################
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
@@ -609,7 +618,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 
 
 ###################################################
-### code chunk number 16: annHeatmap2_Def
+### code chunk number 17: annHeatmap2_Def
 ###################################################
 annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=256, col=g2r.colors, legend=FALSE)
 #
@@ -629,7 +638,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     ## See lattice:::xyplot.formula, modifyLists, lattice:::construct.scales
     def = list(clustfun=hclust, distfun=dist, status="yes", lwd=3, dendro=NULL)
     dendrogram = extractArg(dendrogram, def)
-    def = list(data=NULL, control=list(), asIs=FALSE, inclRef=TRUE)
+    def = list(data=NULL, control=picketPlotControl(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
     def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
     cluster = extractArg(cluster, def)
@@ -730,7 +739,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 
 
 ###################################################
-### code chunk number 17: plot.annHeatmap_Def
+### code chunk number 18: plot.annHeatmap_Def
 ###################################################
 plot.annHeatmap = function(x, widths, heights, ...)
 {
@@ -804,14 +813,14 @@ plot.annHeatmap = function(x, widths, heights, ...)
 
 
 ###################################################
-### code chunk number 18: Generics_Def
+### code chunk number 19: Generics_Def
 ###################################################
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
 
 
 ###################################################
-### code chunk number 19: regHeatmap_Def
+### code chunk number 20: regHeatmap_Def
 ###################################################
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
@@ -821,7 +830,7 @@ regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, 
 
 
 ###################################################
-### code chunk number 20: annHeatmap_Def
+### code chunk number 21: annHeatmap_Def
 ###################################################
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
@@ -831,7 +840,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
 
 
 ###################################################
-### code chunk number 21: annHeatmapExpressionSet_Def
+### code chunk number 22: annHeatmapExpressionSet_Def
 ###################################################
 annHeatmap.ExpressionSet =function(x, ...)
 {

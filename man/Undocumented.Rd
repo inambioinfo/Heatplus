@@ -1,5 +1,6 @@
 \name{Undocumented functions}
 \alias{getLeaves}
+\alias{picketPlotControl}
 \title{Undocumented functions}
 \description{
 These functions are currently undocumented. Please refer to the source and source comments if you feel you need to use them.
