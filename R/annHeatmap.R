@@ -1,4 +1,4 @@
-### R code from vignette source 'vignettes/annHeatmapCommentedSource.Rnw'
+### R code from vignette source '../vignettes/annHeatmapCommentedSource.Rnw'
 
 ###################################################
 ### code chunk number 1: annHeatmapCommentedSource.Rnw:44-45
@@ -323,7 +323,7 @@ niceBreaks = function(xr, breaks)
 {
     ## If you want it, you get it
     if (length(breaks) > 1) {
-        return(breaks)
+        return(sort(breaks))
     }
     ## Ok, so you proposed a number
     ## Neg and pos?
