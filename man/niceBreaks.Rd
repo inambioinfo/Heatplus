@@ -14,7 +14,7 @@ niceBreaks(xr, breaks)
 \details{
 The number of desired breaks is honored as far as possible, which is not actually that often in practice. However, major deviations of three or more are reasonably rare.
 
-The functiona allows the specification of a set of breaks instead of the desired number of breaks, somewhat like in \code{cut}. However, if the length of \code{breaks} is greater than one, the function just returns \code{breaks}.
+The functiona allows the specification of a set of breaks instead of the desired number of breaks, somewhat like in \code{cut}. However, if the length of \code{breaks} is greater than one, the function just sorts the values and returns them otherwise unchanged.
 }
 \value{A vector of pretty breaks covering the specified interval, more or less of the desired length. 
 }

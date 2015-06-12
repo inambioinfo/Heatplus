@@ -391,7 +391,7 @@ niceBreaks = function(xr, breaks)
 {
     ## If you want it, you get it
     if (length(breaks) > 1) {
-        return(breaks)
+        return(sort(breaks))
     }
     ## Ok, so you proposed a number
     ## Neg and pos?
