@@ -1,3 +1,6 @@
+Changes in version 2.15.2
+    + New color scheme for clusters to make neighboring clusters distinct
+
 Changes in version 2.0.0
     + Add both row- and column annotation via annHeatmap2
     + New function regHeatmap as replacement for heatmap_2
