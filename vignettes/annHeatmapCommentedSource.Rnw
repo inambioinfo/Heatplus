@@ -250,7 +250,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
         grp0 = cbind(grpcoord[1:gg], rep(0, gg))
         grp1 = cbind(grpcoord[2:(gg+1)], rep(totalh, gg))
         if (missing(grpcol)) {
-            grpcol=RainbowPastel
+            grpcol=BrewerClusterCol
         }
         if (is.function(grpcol)) grpcol = grpcol(gg)
     }
@@ -644,11 +644,37 @@ print.annHeatmap = function(x, ...)
     
 }}}
 
+{{{\subsection{Nice colors for clusters}
+
+This is the new default color scheme for clusters, see remarks below with \Rfunction{RainbowPastel}. This function wraps the qualitative palettes from \Rpackage{RColorBrewer} and will return a color vector of any specified length: if the number of required colors is larger than the number of available colors in the specifed palette, the colors will be recycled -- visually, this is not a problem, because adjacent clusters will have different colors, and clusters of the same color will be well separated.
+
+In the spirit of the previous coloring, I have chosen \Robject{Pastel1} as the default palette.
+<<BrewerClusterCol_Def>>=
+BrewerClusterCol = function(n, name="Pastel1")
+{
+    ## Check the name of the palette
+    qualpal = subset(RColorBrewer::brewer.pal.info, category=="qual")
+    name = match.arg(name, rownames(qualpal))
+    nmax = qualpal[name, "maxcolors"]
+
+    ## Get the full color vector of the palette
+    cols = RColorBrewer::brewer.pal(nmax, name)
+
+    ## Build the (shortened or recycled) index vector
+    ndx  = rep(1:nmax, length=n)
+
+    cols[ndx]
+}
+@
+
+
+}}}
+
 {{{\subsection{From the previous version}
 
 These functions are copied from the old Heatplus, with little or no changes.
 
-Nice (?) colors for the different clusters:
+Nice colors for the different clusters:
 <<RainbowPastel_Def>>=
 RainbowPastel =  function (n, blanche=200, ...)
 #
@@ -666,7 +692,7 @@ RainbowPastel =  function (n, blanche=200, ...)
     rgb(rgbcv[1,], rgbcv[2,], rgbcv[3, ], maxColorValue=255)
 }
 @
-
+Actually, these colors are NOT nice, in that the extra white component will lead to color vectors with duplicate colors next to each other, already for \Rfunarg{n=5}. Consequently, this is no longer the default color scheme for clusters, and only kept around for traditionalists who like the classic color scheme. 
 
 Compared to the previous version, this one checks whether the propose cutting height is greater than the tree height (in which case it just plots the tree and moves on), and deals correctly with singleton clusters. Note that the treatment of singletons is not great, as it colors the corresponding branch all the way up to the specified cutting height, while non-singletons are only colored up to the fork; this will have to do for now, but is clearly a FIXME (technically, coloring already the trunk above the cut sounds feasible). 
 <<cutplot_dendrogam_Def>>=
@@ -700,7 +726,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
     }
             
     ## Some param processing
-    if (missing(cluscol) | is.null(cluscol)) cluscol = RainbowPastel
+    if (missing(cluscol) | is.null(cluscol)) cluscol = BrewerClusterCol
     
     # Not nice, but necessary
     pn  = stats:::plotNode
@@ -765,7 +791,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     dendrogram = extractArg(dendrogram, def)
     def = list(data=NULL, control=picketPlotControl(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
-    def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
+    def = list(cuth=NULL, grp=NULL, label=NULL, col=BrewerClusterCol)
     cluster = extractArg(cluster, def)
     def = list(cex=NULL, nrow=3, side=NULL, labels=NULL)
     labels = extractArg(labels, def)
