@@ -193,6 +193,12 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
             grpcol=BrewerClusterCol
         }
         if (is.function(grpcol)) grpcol = grpcol(gg)
+        ## In case of manually specified group colors, we only check/use the
+        ## relevant colors and ignore the rest
+        grpcol = grpcol[1:gg]
+        if (gg > 1) {
+            if ( any(grpcol[-1] == grpcol[-gg]) ) warning("neighboring clusters with same color, potentially misleading")
+        }
     }
 
     # Loop over vars and fill in the panels
