@@ -1,4 +1,4 @@
-### R code from vignette source '../vignettes/annHeatmapCommentedSource.Rnw'
+### R code from vignette source 'vignettes/annHeatmapCommentedSource.Rnw'
 
 ###################################################
 ### code chunk number 1: annHeatmapCommentedSource.Rnw:44-45
@@ -190,7 +190,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
         grp0 = cbind(grpcoord[1:gg], rep(0, gg))
         grp1 = cbind(grpcoord[2:(gg+1)], rep(totalh, gg))
         if (missing(grpcol)) {
-            grpcol=RainbowPastel
+            grpcol=BrewerClusterCol
         }
         if (is.function(grpcol)) grpcol = grpcol(gg)
     }
@@ -533,7 +533,27 @@ print.annHeatmap = function(x, ...)
 
 
 ###################################################
-### code chunk number 15: RainbowPastel_Def
+### code chunk number 15: BrewerClusterCol_Def
+###################################################
+BrewerClusterCol = function(n, name="Pastel1")
+{
+    ## Check the name of the palette
+    qualpal = subset(RColorBrewer::brewer.pal.info, category=="qual")
+    name = match.arg(name, rownames(qualpal))
+    nmax = qualpal[name, "maxcolors"]
+
+    ## Get the full color vector of the palette
+    cols = RColorBrewer::brewer.pal(nmax, name)
+
+    ## Build the (shortened or recycled) index vector
+    ndx  = rep(1:nmax, length=n)
+
+    cols[ndx]
+}
+
+
+###################################################
+### code chunk number 16: RainbowPastel_Def
 ###################################################
 RainbowPastel =  function (n, blanche=200, ...)
 #
@@ -553,7 +573,7 @@ RainbowPastel =  function (n, blanche=200, ...)
 
 
 ###################################################
-### code chunk number 16: cutplot_dendrogam_Def
+### code chunk number 17: cutplot_dendrogam_Def
 ###################################################
 cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3, ...)
 #
@@ -585,7 +605,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
     }
             
     ## Some param processing
-    if (missing(cluscol) | is.null(cluscol)) cluscol = RainbowPastel
+    if (missing(cluscol) | is.null(cluscol)) cluscol = BrewerClusterCol
     
     # Not nice, but necessary
     pn  = stats:::plotNode
@@ -618,7 +638,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
 
 
 ###################################################
-### code chunk number 17: annHeatmap2_Def
+### code chunk number 18: annHeatmap2_Def
 ###################################################
 annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row", "col", "none"), breaks=256, col=g2r.colors, legend=FALSE)
 #
@@ -640,7 +660,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     dendrogram = extractArg(dendrogram, def)
     def = list(data=NULL, control=picketPlotControl(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
-    def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
+    def = list(cuth=NULL, grp=NULL, label=NULL, col=BrewerClusterCol)
     cluster = extractArg(cluster, def)
     def = list(cex=NULL, nrow=3, side=NULL, labels=NULL)
     labels = extractArg(labels, def)
@@ -739,7 +759,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
 
 
 ###################################################
-### code chunk number 18: plot.annHeatmap_Def
+### code chunk number 19: plot.annHeatmap_Def
 ###################################################
 plot.annHeatmap = function(x, widths, heights, ...)
 {
@@ -813,14 +833,14 @@ plot.annHeatmap = function(x, widths, heights, ...)
 
 
 ###################################################
-### code chunk number 19: Generics_Def
+### code chunk number 20: Generics_Def
 ###################################################
 regHeatmap = function(x, ...) UseMethod("regHeatmap")
 annHeatmap = function(x, ...) UseMethod("annHeatmap")
 
 
 ###################################################
-### code chunk number 20: regHeatmap_Def
+### code chunk number 21: regHeatmap_Def
 ###################################################
 regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, status="yes"), labels=NULL, legend=TRUE, ...)
 {
@@ -830,7 +850,7 @@ regHeatmap.default = function(x, dendrogram=list(clustfun=hclust, distfun=dist, 
 
 
 ###################################################
-### code chunk number 21: annHeatmap_Def
+### code chunk number 22: annHeatmap_Def
 ###################################################
 annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, distfun=dist, Col=list(status="yes"), Row=list(status="hidden")), cluster=NULL, labels=NULL, legend=TRUE, ...)
 {
@@ -840,7 +860,7 @@ annHeatmap.default = function(x, annotation, dendrogram=list(clustfun=hclust, di
 
 
 ###################################################
-### code chunk number 22: annHeatmapExpressionSet_Def
+### code chunk number 23: annHeatmapExpressionSet_Def
 ###################################################
 annHeatmap.ExpressionSet =function(x, ...)
 {
