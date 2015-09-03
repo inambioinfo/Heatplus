@@ -250,7 +250,7 @@ picketPlot = function (x, grp=NULL, grpcol, grplabel=NULL, horizontal=TRUE, asIs
         grp0 = cbind(grpcoord[1:gg], rep(0, gg))
         grp1 = cbind(grpcoord[2:(gg+1)], rep(totalh, gg))
         if (missing(grpcol)) {
-            grpcol=RainbowPastel
+            grpcol=BrewerClusterCol
         }
         if (is.function(grpcol)) grpcol = grpcol(gg)
     }
@@ -668,9 +668,6 @@ BrewerClusterCol = function(n, name="Pastel1")
 @
 
 
-
-
-
 }}}
 
 {{{\subsection{From the previous version}
@@ -729,7 +726,7 @@ cutplot.dendrogram = function(x, h, cluscol, leaflab= "none", horiz=FALSE, lwd=3
     }
             
     ## Some param processing
-    if (missing(cluscol) | is.null(cluscol)) cluscol = RainbowPastel
+    if (missing(cluscol) | is.null(cluscol)) cluscol = BrewerClusterCol
     
     # Not nice, but necessary
     pn  = stats:::plotNode
@@ -794,7 +791,7 @@ annHeatmap2 = function(x, dendrogram, annotation, cluster, labels, scale=c("row"
     dendrogram = extractArg(dendrogram, def)
     def = list(data=NULL, control=picketPlotControl(), asIs=FALSE, inclRef=TRUE)
     annotation = extractArg(annotation, def)
-    def = list(cuth=NULL, grp=NULL, label=NULL, col=RainbowPastel)
+    def = list(cuth=NULL, grp=NULL, label=NULL, col=BrewerClusterCol)
     cluster = extractArg(cluster, def)
     def = list(cex=NULL, nrow=3, side=NULL, labels=NULL)
     labels = extractArg(labels, def)
