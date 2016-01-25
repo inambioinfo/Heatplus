@@ -9,3 +9,5 @@ Imports: graphics, grDevices, stats, RColorBrewer
 Suggests: Biobase, hgu95av2.db, limma
 biocViews: Microarray, Visualization
 License: GPL (>= 2)
+URL: https://github.com/alexploner/Heatplus
+BugReports: https://github.com/alexploner/Heatplus/issues
